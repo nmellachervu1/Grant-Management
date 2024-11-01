@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grant Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Grant Disbursement Patterns</h1>
+
+    <!-- Form to select a grant -->
+    <form id="grantForm" method="POST">
+        <label for="grant_name">Select Grant:</label>
+        <select id="grant_name" name="grant_name">
+            {% for grant in grants %}
+                <option value="{{ grant }}">{{ grant }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- Placeholder for the chart -->
+    <canvas id="disbursementChart"></canvas>
+
+    <script>
+        // Listen for form submission
+        document.getElementById('grantForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent page reload on form submission
+
+            const grantName = document.getElementById('grant_name').value;
+
+            // Fetch the data for the selected grant
+            const response = await fetch('/grant_tool', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ grant_name: grantName }),
+            });
+
+            const data = await response.json();
+            createChart(data);  // Call the chart creation function
+        });
+
+        // Function to create the chart using Chart.js
+        function createChart(data) {
+            const ctx = document.getElementById('disbursementChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.grant_time_elapsed,
+                    datasets: [
+                        {
+                            label: 'UDO Predicted Level',
+                            data: data.udo_predicted_level,
+                            borderColor: '#99CCFF',
+                            fill: false
+                        },
+                        {
+                            label: 'Non UDO Predicted Level',
+                            data: data.non_udo_predicted_level,
+                            borderColor: '#FF9999',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '% of Grant Time Elapsed'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '% of Obligation Liquidated'
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Add the specific grant data if available
+            if (data.grant_data) {
+                const grantDataset = {
+                    label: `${data.grant_status}`,
+                    data: data.grant_data.Obligation_Spent,
+                    borderColor: 'black',
+                    borderDash: [5, 5],
+                    fill: false
+                };
+                chart.data.datasets.push(grantDataset);
+                chart.update();
+            }
+        }
+    </script>
+</body>
+</html>

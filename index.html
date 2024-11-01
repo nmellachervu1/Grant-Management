@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grant Analysis</title>
-</head>
-<body>
-    <h1>Select Grant Name</h1>
-    <form method="post" action="/">
-        <label for="grant_name">Grant Name:</label>
-        <select id="grant_name" name="grant_name" required>
-            {% for grant in grants %}
-                <option value="{{ grant }}">{{ grant }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Submit</button>
-    </form>
-    <br>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{url_for("static", filename="styles.css")}}" />
+        <title>Obligation POC</title>
+    </head>
+    <body>
+        <h1>Welcome to the Obligation Grant Tool</h1>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi ea unde error vitae, eligendi reiciendis, quam culpa delectus recusandae quas illum laboriosam perspiciatis dolore totam inventore repellendus earum veritatis quidem.</p>
+    </body>
 </html>
