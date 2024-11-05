@@ -34,6 +34,11 @@ SA_grants = [
     '19NU2GGH00219419HQTB9390FKV2020', '21NU2GGH0023789390K872023', '22NU2GGH0024369390HD32022'
 ]
 
+India_grants = [
+    '20NU2HGH000006C39390GAM2021', '20NU2GGH00231221C39390G802021', '21NU2HGH000088C39390GDP2021',
+    '20NU2HGH0000049390EQL2020', '20NU2HGH00000693906BX2021'
+]
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -53,9 +58,20 @@ def grant():
     return render_template("grant_js_form.html", grants=grants)
 
 @app.route("/SA")
-def portfolio():
+def portfolio_SA():
     data = generate_graph_without_overlay()
     latest_months_data = latest_months_in_grants(SA_grants)
+    #print(latest_months_data)
+    if isinstance(data, tuple):
+        return data[0], data[1]
+    #return render_template("SA.html", data=data)
+    # Render the template with the generated data
+    return render_template("SA_points6v2.html", data=data, latest_months_data=latest_months_data)
+
+@app.route("/India")
+def portfolio_India():
+    data = generate_graph_without_overlay()
+    latest_months_data = latest_months_in_grants(India_grants)
     #print(latest_months_data)
     if isinstance(data, tuple):
         return data[0], data[1]
