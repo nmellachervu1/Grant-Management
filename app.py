@@ -39,6 +39,12 @@ India_grants = [
     '20NU2HGH0000049390EQL2020', '20NU2HGH00000693906BX2021'
 ]
 
+Ethiopia_grants = [
+    '20NU2HGH000077C39390GFF2021', '20NU2HGH000072CV9390ETK2020', '20NU2HGH000072C39390GE32021', 
+    '20NU2HGH000077EBOLCV9390GUA2021'
+]
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -60,13 +66,18 @@ def grant():
 @app.route("/SA")
 def portfolio_SA():
     data = generate_graph_without_overlay()
-    latest_months_data = latest_months_in_grants(SA_grants)
+    latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(SA_grants)
     #print(latest_months_data)
     if isinstance(data, tuple):
         return data[0], data[1]
     #return render_template("SA.html", data=data)
     # Render the template with the generated data
-    return render_template("SA_points6v2.html", data=data, latest_months_data=latest_months_data)
+
+    # Formatting
+    total_obligations = "${:,.0f}".format(total_obligations)
+    total_liquidated = "${:,.0f}".format(total_liquidated)
+
+    return render_template("SA_points6v2.html", data=data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated)
 
 @app.route("/India")
 def portfolio_India():
@@ -146,7 +157,19 @@ def latest_months_in_grants(grants):
             'ObligationSpent': latest_months_filtered['Obligation Spent'].tolist()
         }
 
-        return data
+        # Calculate Total Obligations in Dollars using the latest_months_filtered
+        total_obligations = latest_months_filtered["Obligation"].sum()
+
+        # Calculate Total Liquidated in Dollars using the latest_months_filtered
+        total_liquidated = latest_months_filtered["Disbursement"].sum()
+
+        # Calculate Current UDO using Difference between Total Obligations and Total Liquidated
+        total_current_UDO = total_obligations - total_liquidated
+
+        # Calculate UDO percentage using current udo over total obligations
+        UDO_percentage = total_current_UDO / total_obligations
+
+        return data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage
 
     except Exception as e:
         return str(e), 500

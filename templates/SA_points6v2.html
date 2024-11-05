@@ -5,6 +5,33 @@
     <h5>UDO & Non-UDO Disbursement Patterns</h5>
     <canvas id="myChart" width="300" height="150" aria-label="Chart showing UDO and Non-UDO Disbursement Patterns" role="img"></canvas>
 </div>
+
+<!-- Bootstrap Card for Total Obligations -->
+<div class="container text-center">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+            <div class="card-header">
+                Total Obligations ($)
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ total_obligations }}</p>
+            </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+            <div class="card-header">
+                Total Liquidated ($)
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ total_liquidated }}</p>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
