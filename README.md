@@ -15,7 +15,7 @@
 
 `source <ENV_NAME>/bin/activate`
 
-`pip install -r requirements.txt` 
+`pip3 install -r requirements.txt` 
 
 - To exit environment
 `deactivate`
