@@ -77,7 +77,9 @@ def portfolio_SA():
     #total_obligations = "${:,.0f}".format(total_obligations)
     #total_liquidated = "${:,.0f}".format(total_liquidated)
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated)
+    remaining_obligations = total_obligations - total_liquidated
+
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations)
 
 @app.route("/India")
 def portfolio_India():

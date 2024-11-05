@@ -13,21 +13,28 @@
         <!-- Canvas for Donut Chart -->
         <div class="container-md mt-4">
             <h5>Total Obligations vs Total Liquidated</h5>
-            <canvas id="donutChart" width="150" height="75" aria-label="Donut chart showing Total Obligations and Total Liquidated" role="img"></canvas>
+            <canvas id="donutChart" aria-label="Donut chart showing Total Obligations and Total Liquidated" role="img"></canvas>
         </div>
       </div>
       <div class="col">
         <div class="card">
             <div class="card-header">
-                Total Liquidated ($)
+                Total Obligations ($)
             </div>
             <div class="card-body">
-                <p class="card-text">{{ total_liquidated }}</p>
+                <p class="card-text">{{ total_obligations }}</p>
             </div>
         </div>
       </div>
     </div>
 </div>
+
+<style>
+    #donutChart {
+      width: 250px !important;
+      height: 250px !important;
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -151,9 +158,9 @@
         const donutChart = new Chart(donutCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Total Obligations', 'Total Liquidated'],
+                labels: ['Remaining Obligations', 'Total Liquidated'],
                 datasets: [{
-                    data: [{{ total_obligations }}, {{ total_liquidated }}],
+                    data: [{{ remaining_obligations }}, {{ total_liquidated }}],
                     backgroundColor: ['#28a745', '#dc3545'], // Green for obligations, Red for liquidated
                     hoverOffset: 4
                 }]
