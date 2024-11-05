@@ -3,7 +3,7 @@
 ### For Windows
 `python -m venv <ENV_NAME>`
 
-`\<ENV_NAME>\scripts\activate`
+`.\<ENV_NAME>\scripts\activate`
 
 `pip install -r requirements.txt` 
 
