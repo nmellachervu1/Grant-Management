@@ -10,13 +10,10 @@
 <div class="container text-center">
     <div class="row">
       <div class="col">
-        <div class="card">
-            <div class="card-header">
-                Total Obligations ($)
-            </div>
-            <div class="card-body">
-                <p class="card-text">{{ total_obligations }}</p>
-            </div>
+        <!-- Canvas for Donut Chart -->
+        <div class="container-md mt-4">
+            <h5>Total Obligations vs Total Liquidated</h5>
+            <canvas id="donutChart" width="150" height="75" aria-label="Donut chart showing Total Obligations and Total Liquidated" role="img"></canvas>
         </div>
       </div>
       <div class="col">
@@ -144,6 +141,28 @@
                                 ];
                             }
                         }
+                    }
+                }
+            }
+        });
+
+        // Donut Chart for Total Obligations vs Total Liquidated
+        const donutCtx = document.getElementById('donutChart').getContext('2d');
+        const donutChart = new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Total Obligations', 'Total Liquidated'],
+                datasets: [{
+                    data: [{{ total_obligations }}, {{ total_liquidated }}],
+                    backgroundColor: ['#28a745', '#dc3545'], // Green for obligations, Red for liquidated
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
                     }
                 }
             }
