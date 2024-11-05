@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+    <h1>{{ grant_status }}</h1>
+    <img src="data:image/png;base64,{{ img_base64 }}" alt="Graph">
+    <br>
+    <br>
+    <a href="{{ url_for('index') }}">Go Back</a>
+</div>
+{% endblock %}
