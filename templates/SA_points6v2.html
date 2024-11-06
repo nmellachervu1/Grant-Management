@@ -25,10 +25,26 @@
       <div class="col">
         <div class="card mt-4">
             <div class="card-header" style= "font-weight: bold;">
-                Total Obligations ($)
+                Total Obligations in Dollars
             </div>
             <div class="card-body">
                 <p class="card-text">${{ '{:,.0f}'.format(total_obligations) }}</p>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header" style= "font-weight: bold;">
+                Total Current UDO in Dollars
+            </div>
+            <div class="card-body">
+                <p class="card-text">${{ '{:,.0f}'.format(total_current_UDO) }}</p>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header" style= "font-weight: bold;">
+                Percentage UDO
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ UDO_percentage }}%</p>
             </div>
         </div>
       </div>
