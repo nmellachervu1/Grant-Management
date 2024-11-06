@@ -18,6 +18,17 @@
                 labels: data.GrantTimeElapsed,
                 datasets: [
                     {
+                        label: 'Grant Trend Line',
+                        data: overlayData.GrantTimeElapsed.map((x, i) => ({ x: x, y: overlayData.ObligationSpent[i] })),
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        borderColor: 'rgba(0, 0, 0, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 5,
+                        borderDash: [10, 5], // Dashed line
+                        order: 0 // Bring to front
+                    },
+                    {
                         label: 'UDO Predicted Level',
                         data: data.UDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i], y: y })),
                         backgroundColor: 'rgba(153, 204, 255, 0.5)',
@@ -32,17 +43,6 @@
                         borderColor: 'rgba(255, 153, 153, 1)',
                         borderWidth: 0.25,
                         fill: true
-                    },
-                    {
-                        label: 'Grant Trend Line',
-                        data: overlayData.GrantTimeElapsed.map((x, i) => ({ x: x, y: overlayData.ObligationSpent[i] })),
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        borderColor: 'rgba(0, 0, 0, 1)',
-                        borderWidth: 1,
-                        fill: false,
-                        pointRadius: 5,
-                        borderDash: [10, 5], // Dashed line
-                        order: 0 // Bring to front
                     }
                 ]
             },
@@ -84,7 +84,13 @@
                 },
                 plugins: {
                     legend: {
-                        display: true // Enable default legend
+                        display: true, // Enable default legend
+                        labels: {
+                            font: {
+                                size: 15,
+                                weight: 'bold'
+                            }
+                        }
                     },
                     tooltip: {
                         callbacks: {
