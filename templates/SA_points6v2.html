@@ -19,12 +19,12 @@
         </div>
       </div>
       <div class="col">
-        <div class="card">
+        <div class="card mt-4">
             <div class="card-header">
                 Total Obligations ($)
             </div>
             <div class="card-body">
-                <p class="card-text">{{ total_obligations }}</p>
+                <p class="card-text">${{ '{:,.0f}'.format(total_obligations) }}</p>
             </div>
         </div>
       </div>
