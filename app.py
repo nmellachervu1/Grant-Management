@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 # List of grants
 grants = [
-    '22R43GH0023699390JGK2022', '22R43GH0023899390JLL2022', '22R43GH002391CV9390JLL2022',
+    '20NU2GGH0023029390FKV2021', '22R43GH0023699390JGK2022', '22R43GH0023899390JLL2022', '22R43GH002391CV9390JLL2022',
     '22R43GH002392CV9390JLL2022', '21NU2GGH0023399390FKN2021', '21NU2GGH0023399390HCW2021',
     '21R43GH00236793901A32021', '21R43GH002367939ZZMF2021', '21R43GH00236893901KB2021',
     '21R43GH002368939ZZMF2021'
@@ -313,13 +313,17 @@ def generate_graph_with_grant(grant_name):
 
         if grant_name:
             grant_data = obligation_progression[obligation_progression['Unique ID'] == grant_name]
+
+        latest_month_for_grant = grant_data.sort_values(by='Month', ascending = False).iloc[0]
+
+        grant_months_remaining = latest_month_for_grant['Grant Length Months'] - latest_month_for_grant['Grant Months Elapsed']
         
         grant_data = {
             'GrantTimeElapsed': grant_data['Grant Time Elapsed'].tolist(),
             'ObligationSpent': grant_data['Obligation Spent'].tolist(),
         }
 
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name, months_remaining = grant_months_remaining)
 
 
     except Exception as e:
