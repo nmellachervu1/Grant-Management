@@ -94,6 +94,7 @@
             data: {
                 labels: data.GrantTimeElapsed,
                 datasets: [
+                    ...scatterDatasets, // Add scatter points as individual datasets
                     {
                         label: 'UDO Predicted Level',
                         data: data.UDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i], y: y })),
@@ -109,8 +110,7 @@
                         borderColor: 'rgba(255, 153, 153, 1)',
                         borderWidth: 0.25,
                         fill: true
-                    },
-                    ...scatterDatasets // Add scatter points as individual datasets
+                    }
                 ]
             },
             options: {
@@ -151,7 +151,13 @@
                 },
                 plugins: {
                     legend: {
-                        display: true // Enable default legend
+                        display: true, // Enable default legend
+                        labels: {
+                            font: {
+                                size: 15,
+                                weight: 'bold'
+                            }
+                        }
                     },
                     tooltip: {
                         callbacks: {
