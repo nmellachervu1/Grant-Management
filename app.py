@@ -66,7 +66,9 @@ def grant():
 @app.route("/SA")
 def portfolio_SA():
     #data = generate_graph_without_overlay()
+    country = "SOUTH AFRICA"
     area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(SA_grants)
+    country_area_data = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
         return area_data[0], area_data[1]
@@ -79,7 +81,7 @@ def portfolio_SA():
 
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa")
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data)
 
 @app.route("/India")
 def portfolio_India():
@@ -428,6 +430,119 @@ def generate_graph_without_overlay():
     except Exception as e:
         return str(e), 500
 
+def generate_country_graph_without_overlay(Country_Name):
+    try:
+        udo_ts = pd.read_excel("GHC FY21-23 Grant UDO Data.xlsx")
+        udo_c = pd.read_excel("GHC Grant Data Test.xlsx", skiprows=3, header=1)
+
+        # Select relevant columns
+        udo_c_selected = udo_c[["Unique ID","Country","CAN", "Grantee", "Fund Year", "Fund Description",  "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date"]]
+
+        #udo_c_selected = udo_c_selected[udo_c_selected['Grant End Date'] < "2023-09-30"]
+        # Merge dataframes
+        udo_combined = udo_ts.merge(udo_c_selected, how='left', on='Unique ID')
+        udo_combined.sort_values(by=['Unique ID', 'Month'], axis=0, inplace=True, ignore_index=True)
+
+        # Process data
+        obligation_progression = udo_combined[["Unique ID", "Country","CAN", "Grantee", "Fund Year", "Fund Description", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable"]]
+
+        obligation_progression["Month"] = pd.to_datetime(obligation_progression["Month"], infer_datetime_format=True)
+        obligation_progression["Grant End Date"] = pd.to_datetime(obligation_progression["Grant End Date"], infer_datetime_format=True)
+        obligation_progression["Grant End Date EOM"] = obligation_progression["Grant End Date"] + pd.offsets.MonthEnd(0)
+        obligation_progression["Grant Start Date EOM"] = obligation_progression["Grant Start Date"] + pd.offsets.MonthEnd(0)
+        obligation_progression = obligation_progression[obligation_progression["Month"] <= obligation_progression["Grant End Date EOM"]]
+                
+        def month_diff(start, end):
+            return (end.year - start.year) * 12 + end.month - start.month
+                
+                # Calculate grant length in number of months
+        obligation_progression["Grant Length Months"] = obligation_progression.groupby("Unique ID").apply(
+            lambda group: group.apply(
+                lambda row: month_diff(row["Grant Start Date EOM"], row["Grant End Date EOM"]), axis=1)).reset_index(level=0, drop=True)
+
+        # Calculate months elapsed since grant start date
+        obligation_progression["Grant Months Elapsed"] = obligation_progression.groupby("Unique ID").apply(
+            lambda group: group.apply(
+                lambda row: month_diff(row["Grant Start Date EOM"], row["Month"]), axis=1)).reset_index(level=0, drop=True)
+
+        # Calculate months elapsed since grant start date
+        obligation_progression["Grant Months Left"] = obligation_progression["Grant Length Months"] - obligation_progression["Grant Months Elapsed"]
+
+        # Calculate percent of grant time elapsed
+        obligation_progression["Grant Time Elapsed"] = obligation_progression["Grant Months Elapsed"] / obligation_progression["Grant Length Months"]
+
+        # Calculate percent of obligation spent
+        obligation_progression["Obligation Spent"] = obligation_progression["Disbursement"] / obligation_progression["Obligation"]
+
+        # Filter out rows with Obligation Spent greater than 1
+        obligation_progression = obligation_progression[obligation_progression["Obligation Spent"] <= 1]
+
+        # Filter out rows with Grant Time Elapsed less than 0
+        obligation_progression = obligation_progression[obligation_progression["Grant Time Elapsed"] >= 0]
+
+        # Convert to percentages
+        obligation_progression["Grant Time Elapsed"] *= 100
+        obligation_progression["Obligation Spent"] *= 100
+
+        # Ensure Obligation Spent is between 0 and 100
+        obligation_progression = obligation_progression[(obligation_progression["Obligation Spent"] >= 0) & (obligation_progression["Obligation Spent"] <= 100)]
+
+        uid_counts = obligation_progression['Unique ID'].value_counts()
+
+        # Step 2: Filter UIDs with more than 2 records
+        uids_with_more_than_2_records = uid_counts[uid_counts > 1].index
+
+        # Step 3: Filter the DataFrame to include only these UIDs
+        filtered_obligation_progression = obligation_progression[obligation_progression['Unique ID'].isin(uids_with_more_than_2_records)]
+
+        filtered_obligation_progression1 = filtered_obligation_progression[filtered_obligation_progression['Country'] == Country_Name]
+
+        obligation_progression = filtered_obligation_progression1
+
+        udo_progression = obligation_progression[obligation_progression["UDO Status"] == "ULO"]
+        non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non ULO"]
+
+        # Train model for UDO
+        X = udo_progression[["Grant Time Elapsed"]]
+        y = udo_progression["Obligation Spent"]
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        model_udo = LinearRegression()
+        model_udo.fit(X_train, y_train)
+        y_pred = model_udo.predict(X_test)
+
+        # Train model for Non-UDO
+        non_udo_progression_clean = non_udo_progression.replace([np.inf, -np.inf], np.nan).dropna()
+        X = non_udo_progression_clean[["Grant Time Elapsed"]]
+        y = non_udo_progression_clean["Obligation Spent"]
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        model_nonudo = LinearRegression()
+        model_nonudo.fit(X_train, y_train)
+        y_pred = model_nonudo.predict(X_test)
+
+        ## Generate predictions
+        continuous_range = np.arange(0.00, 100.0, 0.1)  # Adjusted range for percentages
+        disbursement_predictions = pd.DataFrame({'Grant Time Elapsed': continuous_range})
+        udo_pred = model_udo.predict(disbursement_predictions[['Grant Time Elapsed']])
+        non_udo_pred = model_nonudo.predict(disbursement_predictions[['Grant Time Elapsed']])
+
+        # Clip predictions to ensure they are between 0 and 100
+        udo_pred = np.clip(udo_pred, 0, 100)
+        non_udo_pred = np.clip(non_udo_pred, 0, 100)
+
+        disbursement_predictions['UDO Predicted Level'] = udo_pred
+        disbursement_predictions['Non UDO Predicted Level'] = non_udo_pred
+
+        # Convert the data to JSON format
+        data = {
+            'GrantTimeElapsed': disbursement_predictions['Grant Time Elapsed'].tolist(),
+            'UDOPredictedLevel': disbursement_predictions['UDO Predicted Level'].tolist(),
+            'NonUDOPredictedLevel': disbursement_predictions['Non UDO Predicted Level'].tolist()
+        }
+
+        return data
+
+    except Exception as e:
+        return str(e), 500
 
 def generate_graph(grant_name):
     try:
