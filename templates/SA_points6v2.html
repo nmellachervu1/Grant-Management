@@ -4,7 +4,7 @@
 <div class="container-md mt-4">
     <label for="dataSelector" style= "font-weight: bold;">Select UDO Area Source:</label>
     <select id="dataSelector">
-        <option value="data">Overall Data</option>
+        <option value="data_global">Overall Data</option>
         <option value="data_country">Country-Specific Data</option>
     </select>
 </div>
@@ -207,10 +207,12 @@
 
         // Event listener for data selector
         document.getElementById('dataSelector').addEventListener('change', function(event) {
-            const selectedData = event.target.value === 'global' ? data_global : data_country;
+            const selectedData = event.target.value === 'data_global' ? data_global : data_country;
             
             // Destroy the current chart instance
-            currentChart.destroy();
+            if(currentChart){
+                currentChart.destroy();
+            }
             
             // Create a new chart with the selected data
             currentChart = createChart(selectedData);
