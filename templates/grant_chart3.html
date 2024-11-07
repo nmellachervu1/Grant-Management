@@ -46,6 +46,7 @@
         const data_global = {{ data|tojson }};
         const overlayData = {{ grant_data|tojson }};
         const data_country = {{ country_area_data|tojson }};
+        const avgObligationSpent = {{ avg_line|tojson }};
         
         function createChart(data) {
             const ctx = document.getElementById('myChart').getContext('2d');
@@ -64,6 +65,16 @@
                             pointRadius: 5,
                             borderDash: [10, 5], // Dashed line
                             order: 0 // Bring to front
+                        },
+                        {
+                            label: 'Average Obligation Spent',
+                            data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x, y: avgObligationSpent.ObligationSpent[i] })),
+                            backgroundColor: 'rgba(255, 0, 0, 0.5)',
+                            borderColor: 'rgba(255, 0, 0, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                            order: 1 // Ensure it appears above other lines
                         },
                         {
                             label: 'UDO Predicted Level',

@@ -64,8 +64,9 @@ def grant():
         country = "SOUTH AFRICA"
         data, grant_data, grant_name2, grant_months_remaining = generate_graph_with_grant(grant_name)
         
-        country_area_data = generate_country_graph_without_overlay(country)
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data)
+        country_area_data, avg_line = generate_country_graph_without_overlay(country)
+        print(avg_line)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line)
     return render_template("grant_js_form.html", grants=grants)
 
 @app.route("/SA")
@@ -506,6 +507,17 @@ def generate_country_graph_without_overlay(Country_Name):
         udo_progression = obligation_progression[obligation_progression["UDO Status"] == "ULO"]
         non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non ULO"]
 
+        # Calculate the average line of obligation spent against time elapsed
+        avg_obligation_spent = obligation_progression.groupby("Grant Time Elapsed")["Obligation Spent"].mean().reset_index()
+
+        avg_obligation_spent_list = {
+            'GrantTimeElapsed': avg_obligation_spent['Grant Time Elapsed'].tolist(),
+            'ObligationSpent': avg_obligation_spent['Obligation Spent'].tolist()
+        }
+
+        # Apply rolling window to smooth the data
+        avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=5).mean().tolist()
+
         # Train model for UDO
         X = udo_progression[["Grant Time Elapsed"]]
         y = udo_progression["Obligation Spent"]
@@ -543,7 +555,7 @@ def generate_country_graph_without_overlay(Country_Name):
             'NonUDOPredictedLevel': disbursement_predictions['Non UDO Predicted Level'].tolist()
         }
 
-        return data
+        return data, avg_obligation_spent_list
 
     except Exception as e:
         return str(e), 500
