@@ -516,7 +516,7 @@ def generate_country_graph_without_overlay(Country_Name):
         }
 
         # Apply rolling window to smooth the data
-        avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=5).mean().tolist()
+        avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=10).mean().tolist()
 
         # Train model for UDO
         X = udo_progression[["Grant Time Elapsed"]]
