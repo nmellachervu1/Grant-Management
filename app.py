@@ -60,7 +60,12 @@ def grant_old():
 def grant():
     if request.method == "POST":
         grant_name = request.form.get("grant_name")
-        return generate_graph_with_grant(grant_name)
+        #need to implement method to grab country via grant_name
+        country = "SOUTH AFRICA"
+        data, grant_data, grant_name2, grant_months_remaining = generate_graph_with_grant(grant_name)
+        
+        country_area_data = generate_country_graph_without_overlay(country)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data)
     return render_template("grant_js_form.html", grants=grants)
 
 @app.route("/SA")
@@ -324,8 +329,7 @@ def generate_graph_with_grant(grant_name):
             'GrantTimeElapsed': grant_data['Grant Time Elapsed'].tolist(),
             'ObligationSpent': grant_data['Obligation Spent'].tolist(),
         }
-
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name, months_remaining = grant_months_remaining)
+        return data, grant_data, grant_name, grant_months_remaining
 
 
     except Exception as e:
