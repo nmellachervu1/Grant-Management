@@ -66,11 +66,11 @@ def grant():
         grant_name = request.form.get("grant_name")
         #need to implement method to grab country via grant_name
         country = "SOUTH AFRICA"
-        data, grant_data, grant_name2, grant_months_remaining, grantee = generate_graph_with_grant(grant_name)
+        data, grant_data, grant_name2, grant_months_remaining, grantee, grant_obligation = generate_graph_with_grant(grant_name)
         
         country_area_data, avg_line = generate_country_graph_without_overlay(country)
         #print(avg_line)
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation)
     return render_template("grant_js_form.html", grants=grants)
 
 @app.route("/SA")
@@ -379,14 +379,14 @@ def generate_graph_with_grant(grant_name):
 
         grant_months_remaining = latest_month_for_grant['Grant Length Months'] - latest_month_for_grant['Grant Months Elapsed']
         
-        #grant_obligation = latest_month_for_grant['Obligation']
+        grant_obligation = latest_month_for_grant['Obligation']
         grant_grantee = latest_month_for_grant['Grantee']
         
         grant_data = {
             'GrantTimeElapsed': grant_data['Grant Time Elapsed'].tolist(),
             'ObligationSpent': grant_data['Obligation Spent'].tolist(),
         }
-        return data, grant_data, grant_name, grant_months_remaining, grant_grantee 
+        return data, grant_data, grant_name, grant_months_remaining, grant_grantee, grant_obligation
 
 
     except Exception as e:
