@@ -72,6 +72,7 @@
         const data_global = {{ data|tojson }};
         const latestMonthsData = {{ latest_months_data|tojson }};
         const data_country = {{ country_area_data|tojson }};
+        const avgObligationSpent = {{ avg_line|tojson }};
         
         // Function to generate unique colors
         function getRandomColor() {
@@ -106,6 +107,16 @@
                 labels: data.GrantTimeElapsed,
                 datasets: [
                 ...scatterDatasets,
+                {
+                    label: 'Average Obligation Spent',
+                    data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x, y: avgObligationSpent.ObligationSpent[i] })),
+                    backgroundColor: 'rgba(255, 0, 0, 0.5)',
+                    borderColor: 'rgba(255, 0, 0, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: 0,
+                    order: 1 // Ensure it appears above other lines
+                },
                 {
                     label: 'UDO Predicted Level',
                     data: data.UDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i], y: y })),

@@ -87,7 +87,7 @@ def portfolio_SA():
 
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data)
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data, avg_line = avg_line)
 
 @app.route("/India")
 def portfolio_India():
