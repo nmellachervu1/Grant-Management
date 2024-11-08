@@ -109,6 +109,26 @@ def portfolio_India():
 
     return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "India", country_area_data = country_area_data, avg_line = avg_line)
 
+@app.route("/Ethiopia")
+def portfolio_Ethiopia():
+    #data = generate_graph_without_overlay()
+    country = "ETHIOPIA"
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(Ethiopia_grants)
+    country_area_data, avg_line = generate_country_graph_without_overlay(country)
+    #print(latest_months_data)
+    if isinstance(area_data, tuple):
+        return area_data[0], area_data[1]
+    #return render_template("SA.html", data=data)
+    # Render the template with the generated data
+
+    # Formatting
+    #total_obligations = "${:,.0f}".format(total_obligations)
+    #total_liquidated = "${:,.0f}".format(total_liquidated)
+
+    remaining_obligations = total_obligations - total_liquidated
+
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Ethiopia", country_area_data = country_area_data, avg_line = avg_line)
+
 def latest_months_in_grants(grants):
     try:
         # Load Excel files
