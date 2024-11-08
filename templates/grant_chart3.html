@@ -43,6 +43,14 @@
                 <p class="card-text">{{ months_remaining }} Months</p>
             </div>
         </div>
+        <div class="card mt-4">
+            <div class="card-header" style= "font-weight: bold;">
+                Liquidated in Dollars
+            </div>
+            <div class="card-body">
+                <p class="card-text">${{ '{:,.0f}'.format(grant_liquidated) }}</p>
+            </div>
+        </div>
       </div>
     </div>
 </div>
