@@ -65,7 +65,7 @@ def grant():
         data, grant_data, grant_name2, grant_months_remaining = generate_graph_with_grant(grant_name)
         
         country_area_data, avg_line = generate_country_graph_without_overlay(country)
-        print(avg_line)
+        #print(avg_line)
         return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line)
     return render_template("grant_js_form.html", grants=grants)
 
