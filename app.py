@@ -74,7 +74,7 @@ def portfolio_SA():
     #data = generate_graph_without_overlay()
     country = "SOUTH AFRICA"
     area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(SA_grants)
-    country_area_data = generate_country_graph_without_overlay(country)
+    country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
         return area_data[0], area_data[1]
