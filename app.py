@@ -91,14 +91,23 @@ def portfolio_SA():
 
 @app.route("/India")
 def portfolio_India():
-    data = generate_graph_without_overlay()
-    latest_months_data = latest_months_in_grants(India_grants)
+    #data = generate_graph_without_overlay()
+    country = "INDIA"
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(India_grants)
+    country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
-    if isinstance(data, tuple):
-        return data[0], data[1]
+    if isinstance(area_data, tuple):
+        return area_data[0], area_data[1]
     #return render_template("SA.html", data=data)
     # Render the template with the generated data
-    return render_template("SA_points6v2.html", data=data, latest_months_data=latest_months_data)
+
+    # Formatting
+    #total_obligations = "${:,.0f}".format(total_obligations)
+    #total_liquidated = "${:,.0f}".format(total_liquidated)
+
+    remaining_obligations = total_obligations - total_liquidated
+
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "India", country_area_data = country_area_data, avg_line = avg_line)
 
 def latest_months_in_grants(grants):
     try:
