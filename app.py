@@ -77,7 +77,7 @@ def grant():
 def portfolio_SA():
     #data = generate_graph_without_overlay()
     country = "SOUTH AFRICA"
-    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(SA_grants)
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(SA_grants)
     country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
@@ -91,7 +91,7 @@ def portfolio_SA():
 
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data, avg_line = avg_line)
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
 @app.route("/India")
 def portfolio_India():
@@ -273,7 +273,10 @@ def latest_months_in_grants(grants):
         # Calculate UDO percentage using current udo over total obligations
         UDO_percentage = (total_current_UDO / total_obligations) * 100
 
-        return area_data, data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage
+        # Number of grants
+        num_grants = len(latest_months_filtered)
+
+        return area_data, data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants
 
     except Exception as e:
         return str(e), 500
