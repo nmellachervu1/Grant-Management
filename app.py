@@ -97,7 +97,7 @@ def portfolio_SA():
 def portfolio_India():
     #data = generate_graph_without_overlay()
     country = "INDIA"
-    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(India_grants)
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(India_grants)
     country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
@@ -111,13 +111,13 @@ def portfolio_India():
 
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "India", country_area_data = country_area_data, avg_line = avg_line)
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "India", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
 @app.route("/Ethiopia")
 def portfolio_Ethiopia():
     #data = generate_graph_without_overlay()
     country = "ETHIOPIA"
-    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(Ethiopia_grants)
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(Ethiopia_grants)
     country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
@@ -131,13 +131,13 @@ def portfolio_Ethiopia():
 
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Ethiopia", country_area_data = country_area_data, avg_line = avg_line)
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Ethiopia", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
 @app.route("/Mozambique")
 def portfolio_Mozambique():
     #data = generate_graph_without_overlay()
     country = "MOZAMBIQUE"
-    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage = latest_months_in_grants(Ethiopia_grants)
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(Mozambique_grants)
     country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
@@ -151,7 +151,7 @@ def portfolio_Mozambique():
 
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Mozambique", country_area_data = country_area_data, avg_line = avg_line)
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Mozambique", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
 def latest_months_in_grants(grants):
     try:

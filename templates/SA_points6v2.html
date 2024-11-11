@@ -152,10 +152,24 @@
             scatterDatasets.forEach((dataset, i) => {
                 const xValue = dataset.data[0].x;
                 const yValue = dataset.data[0].y;
+                // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
                 
-                // Find the corresponding index in data_global.UDOPredictedLevel
-                const predictedYValue = data_global.UDOPredictedLevel.find((_, index) => data_global.GrantTimeElapsed[index] === xValue);
-    
+                let x1, y1, x2, y2;
+                 
+                for (let index = 0; index < data_global.GrantTimeElapsed.length - 1; index++) {
+                    if (data_global.GrantTimeElapsed[index] <= xValue && data_global.GrantTimeElapsed[index + 1] >= xValue) {
+                        x1 = data_global.GrantTimeElapsed[index];
+                        y1 = data_global.UDOPredictedLevel[index];
+                        x2 = data_global.GrantTimeElapsed[index + 1];
+                        y2 = data_global.UDOPredictedLevel[index + 1];
+                        break;
+                    }
+                }
+                 
+                // Perform linear interpolation to find predicted y-value for the given xValue
+                let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
+                 
+                // Compare yValue with the interpolated predictedYValue
                 if (yValue > predictedYValue) {
                     pointsAbove_global++;
                 } else if (yValue < predictedYValue) {
@@ -177,11 +191,11 @@
 
 
             // Update the div content with the calculated values
-            document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
-            document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
+            //document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
+            //document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
     
-            console.log(`(Global) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_global}`);
-            console.log(`(Global) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_global}`);
+            //console.log(`(Global) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_global}`);
+            //console.log(`(Global) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_global}`);
         }
 
         function calculatePointsAboveBelow_country() {
@@ -191,10 +205,24 @@
             scatterDatasets.forEach((dataset, i) => {
                 const xValue = dataset.data[0].x;
                 const yValue = dataset.data[0].y;
+                // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
                 
-                // Find the corresponding index in data_global.UDOPredictedLevel
-                const predictedYValue = data_country.UDOPredictedLevel.find((_, index) => data_country.GrantTimeElapsed[index] === xValue);
-    
+                let x1, y1, x2, y2;
+                 
+                for (let index = 0; index < data_country.GrantTimeElapsed.length - 1; index++) {
+                    if (data_country.GrantTimeElapsed[index] <= xValue && data_country.GrantTimeElapsed[index + 1] >= xValue) {
+                        x1 = data_country.GrantTimeElapsed[index];
+                        y1 = data_country.UDOPredictedLevel[index];
+                        x2 = data_country.GrantTimeElapsed[index + 1];
+                        y2 = data_country.UDOPredictedLevel[index + 1];
+                        break;
+                    }
+                }
+                 
+                // Perform linear interpolation to find predicted y-value for the given xValue
+                let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
+                 
+                // Compare yValue with the interpolated predictedYValue
                 if (yValue > predictedYValue) {
                     pointsAbove_country++;
                 } else if (yValue < predictedYValue) {
@@ -217,8 +245,8 @@
             //document.getElementById('pointsAbove_country').textContent = pointsAbove_country;
             //document.getElementById('pointsBelow_country').textContent = pointsBelow_country;
     
-            console.log(`(Country) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_country}`);
-            console.log(`(Country) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_country}`);
+            //console.log(`(Country) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_country}`);
+            //console.log(`(Country) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_country}`);
         }
 
         // Call the function to calculate points above and below
