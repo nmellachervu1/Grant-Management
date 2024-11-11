@@ -123,7 +123,8 @@
             borderColor: uniqueColors[i],
             pointRadius: 5,
             showLine: false, // Disable connecting line
-            fullUniqueID: latestMonthsData.UniqueID[i] // Store full Unique ID for tooltip
+            fullUniqueID: latestMonthsData.UniqueID[i], // Store full Unique ID for tooltip
+            monthsRemaining: latestMonthsData.MonthsRemaining[i] //Store Months remaining for tooltip
         }));
 
         function updatePoints(isGlobal) {
@@ -338,7 +339,8 @@
                         return [
                         `UniqueID: ${dataset.fullUniqueID}`,
                         `% Time Elapsed: ${xValue}`,
-                        `% Obligation Spent: ${yValue}`
+                        `% Obligation Spent: ${yValue}`,
+                        `Months Remaining: ${dataset.monthsRemaining}`
                         ];
                     }
                     }

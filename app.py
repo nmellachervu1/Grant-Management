@@ -187,6 +187,9 @@ def latest_months_in_grants(grants):
             lambda group: group.apply(
                 lambda row: month_diff(row["Grant Start Date EOM"], row["Month"]), axis=1)).reset_index(level=0, drop=True)
 
+        # Calculate months remaining in the grant
+        obligation_progression["Months Remaining"] = obligation_progression["Grant Length Months"] - obligation_progression["Grant Months Elapsed"]
+        
         # Calculate percent of grant time elapsed
         obligation_progression["Grant Time Elapsed"] = obligation_progression["Grant Months Elapsed"] / obligation_progression["Grant Length Months"]
 
@@ -258,8 +261,11 @@ def latest_months_in_grants(grants):
         data = {
             'UniqueID': latest_months_filtered['Unique ID'].tolist(),
             'GrantTimeElapsed': latest_months_filtered['Grant Time Elapsed'].tolist(),
-            'ObligationSpent': latest_months_filtered['Obligation Spent'].tolist()
+            'ObligationSpent': latest_months_filtered['Obligation Spent'].tolist(),
+            'MonthsRemaining': latest_months_filtered['Months Remaining'].tolist()
         }
+
+        print(data)
 
         # Calculate Total Obligations in Dollars using the latest_months_filtered
         total_obligations = latest_months_filtered["Obligation"].sum()
