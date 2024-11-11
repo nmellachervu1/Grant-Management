@@ -39,35 +39,35 @@
                 <p class="card-text">${{ '{:,.0f}'.format(total_obligations) }}</p>
             </div>
         </div>
-        <div class = "row">
+        <div class = "row" style="display: flex; flex-wrap: wrap;">
             <div class = "col-md-4">
-                <div class="card mt-4">
+                <div class="card mt-4" style ="height: 125px;">
                     <div class="card-header" style= "font-weight: bold;">
                         Total Number of Grants
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <p class="card-text"> {{ num_grants }}</p>
                         <p class="card-text"></p>
                     </div>
                 </div>
             </div>
             <div class = "col-md-4">
-                <div class="card mt-4">
+                <div class="card mt-4" style ="height: 125px;">
                     <div class="card-header" style= "font-weight: bold;">
                         Expected Full Liquidation
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <p id= "pointsAbove_global" class="card-text"></p>
                         <p id= "pointsAbove_country" class="card-text" style="display: none;"></p>
                     </div>
                 </div>
             </div>
             <div class = "col-md-4">
-                <div class="card mt-4">
+                <div class="card mt-4" style ="height: 125px;">
                     <div class="card-header" style= "font-weight: bold;">
                         Expected Not Full Liquidation
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <p id= "pointsBelow_global" class="card-text"></p>
                         <p id= "pointsBelow_country" class="card-text" style="display: none;"></p>
                     </div>
