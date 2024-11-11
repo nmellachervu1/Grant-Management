@@ -39,12 +39,39 @@
                 <p class="card-text">${{ '{:,.0f}'.format(total_obligations) }}</p>
             </div>
         </div>
-        <div class="card mt-4">
-            <div class="card-header" style= "font-weight: bold;">
-                Number of Grants
+        <div class = "row">
+            <div class = "col-md-4">
+                <div class="card mt-4">
+                    <div class="card-header" style= "font-weight: bold;">
+                        Total Number of Grants
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text"> {{ num_grants }}</p>
+                        <p class="card-text"></p>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <p class="card-text">{{ num_grants }}</p>
+            <div class = "col-md-4">
+                <div class="card mt-4">
+                    <div class="card-header" style= "font-weight: bold;">
+                        Expected Full Liquidation
+                    </div>
+                    <div class="card-body">
+                        <p id= "pointsAbove_global" class="card-text"></p>
+                        <p id= "pointsAbove_country" class="card-text" style="display: none;"></p>
+                    </div>
+                </div>
+            </div>
+            <div class = "col-md-4">
+                <div class="card mt-4">
+                    <div class="card-header" style= "font-weight: bold;">
+                        Expected Not Full Liquidation
+                    </div>
+                    <div class="card-body">
+                        <p id= "pointsBelow_global" class="card-text"></p>
+                        <p id= "pointsBelow_country" class="card-text" style="display: none;"></p>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="card mt-4">
@@ -98,6 +125,105 @@
             showLine: false, // Disable connecting line
             fullUniqueID: latestMonthsData.UniqueID[i] // Store full Unique ID for tooltip
         }));
+
+        function updatePoints(isGlobal) {
+            const pointsAboveGlobal = document.getElementById('pointsAbove_global');
+            const pointsBelowGlobal = document.getElementById('pointsBelow_global');
+            const pointsAboveCountry = document.getElementById('pointsAbove_country');
+            const pointsBelowCountry = document.getElementById('pointsBelow_country');
+
+            if(isGlobal) {
+                pointsAboveGlobal.style.display = 'block';
+                pointsBelowGlobal.style.display = 'block';
+                pointsAboveCountry.style.display = 'none';
+                pointsBelowCountry.style.display = 'none';
+            } else {
+                pointsAboveGlobal.style.display = 'none';
+                pointsBelowGlobal.style.display = 'none';
+                pointsAboveCountry.style.display = 'block';
+                pointsBelowCountry.style.display = 'block';
+            }
+        }
+
+        function calculatePointsAboveBelow_global() {
+            let pointsAbove_global = 0;
+            let pointsBelow_global = 0;
+    
+            scatterDatasets.forEach((dataset, i) => {
+                const xValue = dataset.data[0].x;
+                const yValue = dataset.data[0].y;
+                
+                // Find the corresponding index in data_global.UDOPredictedLevel
+                const predictedYValue = data_global.UDOPredictedLevel.find((_, index) => data_global.GrantTimeElapsed[index] === xValue);
+    
+                if (yValue > predictedYValue) {
+                    pointsAbove_global++;
+                } else if (yValue < predictedYValue) {
+                    pointsBelow_global++;
+                }
+            });
+
+
+            pointsAboveElement_global = document.getElementById('pointsAbove_global');
+            pointsBelowElement_global = document.getElementById('pointsBelow_global');
+
+            if(pointsAboveElement_global) {
+                pointsAboveElement_global.textContent = pointsAbove_global
+            }
+
+            if(pointsBelowElement_global) {
+                pointsBelowElement_global.textContent = pointsBelow_global
+            }
+
+
+            // Update the div content with the calculated values
+            document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
+            document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
+    
+            console.log(`(Global) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_global}`);
+            console.log(`(Global) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_global}`);
+        }
+
+        function calculatePointsAboveBelow_country() {
+            let pointsAbove_country = 0;
+            let pointsBelow_country = 0;
+    
+            scatterDatasets.forEach((dataset, i) => {
+                const xValue = dataset.data[0].x;
+                const yValue = dataset.data[0].y;
+                
+                // Find the corresponding index in data_global.UDOPredictedLevel
+                const predictedYValue = data_country.UDOPredictedLevel.find((_, index) => data_country.GrantTimeElapsed[index] === xValue);
+    
+                if (yValue > predictedYValue) {
+                    pointsAbove_country++;
+                } else if (yValue < predictedYValue) {
+                    pointsBelow_country++;
+                }
+            });
+
+            const pointsAboveElement_country = document.getElementById('pointsAbove_country');
+            const pointsBelowElement_country = document.getElementById('pointsBelow_country');
+
+            // Update the div content with the calculated values
+            if(pointsAboveElement_country){
+                pointsAboveElement_country.textContent = pointsAbove_country;
+            }
+
+            if(pointsBelowElement_country){
+                pointsBelowElement_country.textContent = pointsBelow_country;
+            }
+
+            //document.getElementById('pointsAbove_country').textContent = pointsAbove_country;
+            //document.getElementById('pointsBelow_country').textContent = pointsBelow_country;
+    
+            console.log(`(Country) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_country}`);
+            console.log(`(Country) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_country}`);
+        }
+
+        // Call the function to calculate points above and below
+        calculatePointsAboveBelow_global();
+        calculatePointsAboveBelow_country();
 
         // Function to create chart
         function createChart(data) {
@@ -222,8 +348,11 @@
 
         // Event listener for data selector
         document.getElementById('dataSelector').addEventListener('change', function(event) {
-            const selectedData = event.target.value === 'data_global' ? data_global : data_country;
-            
+            const isGlobal = event.target.value === 'data_global';
+            const selectedData = isGlobal ? data_global : data_country;
+
+            updatePoints(isGlobal);
+
             // Destroy the current chart instance
             if(currentChart){
                 currentChart.destroy();
@@ -232,6 +361,9 @@
             // Create a new chart with the selected data
             currentChart = createChart(selectedData);
         });
+
+        //initially show global data
+        updatePoints(true);
     });
 </script>
 {% endblock %}
