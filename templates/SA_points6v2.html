@@ -15,7 +15,6 @@
         <option value="no_filter">No Filter</option>
         <option value="3_months">3 Months Remaining</option>
         <option value="6_months">6 Months Remaining</option>
-        <option value="9_months">9 Months Remaining</option>
         <option value="12_months">12 Months Remaining</option>
         <option value="24_months">24 Months Remaining</option>
         <option value="36_months">36 Months Remaining</option>
@@ -158,6 +157,7 @@
                 return dataset.monthsRemaining >= minMonths && dataset.monthsRemaining <= maxMonths;
             });
 
+            console.log(filteredDatasets);
             return filteredDatasets;
         }
 
@@ -180,11 +180,17 @@
             }
         }
 
-        function calculatePointsAboveBelow_global() {
+        function calculatePointsAboveBelow_global(filteredDatasets) {
             let pointsAbove_global = 0;
             let pointsBelow_global = 0;
+
+            if(!filteredDatasets || filteredDatasets.length === 0){
+                document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
+                document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
+                return;
+            }
     
-            scatterDatasets.forEach((dataset, i) => {
+            filteredDatasets.forEach((dataset, i) => {
                 const xValue = dataset.data[0].x;
                 const yValue = dataset.data[0].y;
                 // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
@@ -233,11 +239,17 @@
             //console.log(`(Global) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_global}`);
         }
 
-        function calculatePointsAboveBelow_country() {
+        function calculatePointsAboveBelow_country(filteredDatasets) {
             let pointsAbove_country = 0;
             let pointsBelow_country = 0;
+
+            if(!filteredDatasets || filteredDatasets.length === 0){
+                document.getElementById('pointsAbove_country').textContent = pointsAbove_country;
+                document.getElementById('pointsBelow_country').textContent = pointsBelow_country;
+                return;
+            }
     
-            scatterDatasets.forEach((dataset, i) => {
+            filteredDatasets.forEach((dataset, i) => {
                 const xValue = dataset.data[0].x;
                 const yValue = dataset.data[0].y;
                 // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
@@ -407,8 +419,13 @@
             }
         });
 
+        
+        const initialTimeFrame = 'no_filter'
+        const filteredScatterDatasets = filterScatterData(initialTimeFrame);
         // Initial chart creation with global data
-        let currentChart = createChart(data_global, scatterDatasets);
+        let currentChart = createChart(data_global, filteredScatterDatasets);
+
+        calculatePointsAboveBelow_global(filteredScatterDatasets);
 
         // Event listener for data selector
         document.getElementById('dataSelector').addEventListener('change', function(event) {
@@ -427,6 +444,12 @@
             
             // Create a new chart with the selected data
             currentChart = createChart(selectedData, filteredScatterDatasets);
+
+            if(isGlobal) {
+                calculatePointsAboveBelow_global(filteredScatterDatasets);
+            } else {
+                calculatePointsAboveBelow_country(filteredScatterDatasets);
+            }
         });
 
         //initially show global data
@@ -444,6 +467,12 @@
             }
 
             currentChart = createChart(selectedData, filteredScatterDatasets);
+
+            if(isGlobal) {
+                calculatePointsAboveBelow_global(filteredScatterDatasets);
+            } else {
+                calculatePointsAboveBelow_country(filteredScatterDatasets);
+            }
         });
     });
 </script>
