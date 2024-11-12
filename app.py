@@ -65,12 +65,12 @@ def grant():
     if request.method == "POST":
         grant_name = request.form.get("grant_name")
         #need to implement method to grab country via grant_name
-        country = "SOUTH AFRICA"
-        data, grant_data, grant_name2, grant_months_remaining, grantee, grant_obligation, grant_liquidated, grant_udo, udo_percentage = generate_graph_with_grant(grant_name)
-        
+        #country = "SOUTH AFRICA"
+        data, grant_data, grant_name2, grant_months_remaining, grantee, grant_obligation, grant_liquidated, grant_udo, udo_percentage, country = generate_graph_with_grant(grant_name)
+        #print(country)
         country_area_data, avg_line = generate_country_graph_without_overlay(country)
         #print(avg_line)
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country)
     return render_template("grant_js_form.html", grants=grants)
 
 @app.route("/SA")
@@ -294,14 +294,14 @@ def generate_graph_with_grant(grant_name):
         udo_c = pd.read_excel("GHC Grant Data Test.xlsx", skiprows=3, header=1)
         
         # Select relevant columns
-        udo_c_selected = udo_c[["Unique ID", "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date", "Grantee"]]
+        udo_c_selected = udo_c[["Unique ID", "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date", "Grantee", "Country"]]
         
         # Merge dataframes
         udo_combined = udo_ts.merge(udo_c_selected, how='left', on='Unique ID')
         udo_combined.sort_values(by=['Unique ID', 'Month'], axis=0, inplace=True, ignore_index=True)
         
         # Process data
-        obligation_progression = udo_combined[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable", "Grantee"]]
+        obligation_progression = udo_combined[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable", "Grantee", "Country"]]
         obligation_progression["Month"] = pd.to_datetime(obligation_progression["Month"], infer_datetime_format=True)
         obligation_progression["Grant End Date"] = pd.to_datetime(obligation_progression["Grant End Date"], infer_datetime_format=True)
         obligation_progression["Grant End Date EOM"] = obligation_progression["Grant End Date"] + pd.offsets.MonthEnd(0)
@@ -393,12 +393,13 @@ def generate_graph_with_grant(grant_name):
         grant_liquidated = latest_month_for_grant['Disbursement']
         grant_udo = grant_obligation - grant_liquidated
         grant_UDO_percentage = (grant_udo / grant_obligation) * 100
-        
+        grant_country = latest_month_for_grant['Country']
+
         grant_data = {
             'GrantTimeElapsed': grant_data['Grant Time Elapsed'].tolist(),
             'ObligationSpent': grant_data['Obligation Spent'].tolist(),
         }
-        return data, grant_data, grant_name, grant_months_remaining, grant_grantee, grant_obligation, grant_liquidated, grant_udo, grant_UDO_percentage
+        return data, grant_data, grant_name, grant_months_remaining, grant_grantee, grant_obligation, grant_liquidated, grant_udo, grant_UDO_percentage, grant_country
 
 
     except Exception as e:
