@@ -58,8 +58,8 @@
                         Total Number of Grants
                     </div>
                     <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <p class="card-text"> {{ num_grants }}</p>
-                        <p class="card-text"></p>
+                        <p id= "totalGrants_global" class="card-text"></p>
+                        <p id= "totalGrants_country" class="card-text" style="display: none;"></p>
                     </div>
                 </div>
             </div>
@@ -164,29 +164,37 @@
         function updatePoints(isGlobal) {
             const pointsAboveGlobal = document.getElementById('pointsAbove_global');
             const pointsBelowGlobal = document.getElementById('pointsBelow_global');
+            const totalGrantsGlobal = document.getElementById('totalGrants_global');
             const pointsAboveCountry = document.getElementById('pointsAbove_country');
             const pointsBelowCountry = document.getElementById('pointsBelow_country');
+            const totalGrantsCountry = document.getElementById('totalGrants_country');
 
             if(isGlobal) {
                 pointsAboveGlobal.style.display = 'block';
                 pointsBelowGlobal.style.display = 'block';
+                totalGrantsGlobal.style.display = 'block';
                 pointsAboveCountry.style.display = 'none';
                 pointsBelowCountry.style.display = 'none';
+                totalGrantsCountry.style.display = 'none';
             } else {
                 pointsAboveGlobal.style.display = 'none';
                 pointsBelowGlobal.style.display = 'none';
+                totalGrantsGlobal.style.display = 'none';
                 pointsAboveCountry.style.display = 'block';
                 pointsBelowCountry.style.display = 'block';
+                totalGrantsCountry.style.display = 'block';
             }
         }
 
         function calculatePointsAboveBelow_global(filteredDatasets) {
             let pointsAbove_global = 0;
             let pointsBelow_global = 0;
+            let totalGrants_global = 0;
 
             if(!filteredDatasets || filteredDatasets.length === 0){
                 document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
                 document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
+                document.getElementById('totalGrants_global').textContent = totalGrants_global;
                 return;
             }
     
@@ -218,9 +226,11 @@
                 }
             });
 
+            totalGrants_global = pointsAbove_global + pointsBelow_global;
 
             pointsAboveElement_global = document.getElementById('pointsAbove_global');
             pointsBelowElement_global = document.getElementById('pointsBelow_global');
+            totalGrantsElement_global = document.getElementById('totalGrants_global');
 
             if(pointsAboveElement_global) {
                 pointsAboveElement_global.textContent = pointsAbove_global
@@ -228,6 +238,10 @@
 
             if(pointsBelowElement_global) {
                 pointsBelowElement_global.textContent = pointsBelow_global
+            }
+
+            if(totalGrantsElement_global){
+                totalGrantsElement_global.textContent = totalGrants_global
             }
 
 
@@ -242,10 +256,12 @@
         function calculatePointsAboveBelow_country(filteredDatasets) {
             let pointsAbove_country = 0;
             let pointsBelow_country = 0;
+            let totalGrants_country = 0;
 
             if(!filteredDatasets || filteredDatasets.length === 0){
                 document.getElementById('pointsAbove_country').textContent = pointsAbove_country;
                 document.getElementById('pointsBelow_country').textContent = pointsBelow_country;
+                document.getElementById('totalGrants_country').textContent = totalGrants_country;
                 return;
             }
     
@@ -277,8 +293,11 @@
                 }
             });
 
+            totalGrants_country = pointsAbove_country + pointsBelow_country;
+
             const pointsAboveElement_country = document.getElementById('pointsAbove_country');
             const pointsBelowElement_country = document.getElementById('pointsBelow_country');
+            const totalGrantsElement_country = document.getElementById('totalGrants_country');
 
             // Update the div content with the calculated values
             if(pointsAboveElement_country){
@@ -287,6 +306,10 @@
 
             if(pointsBelowElement_country){
                 pointsBelowElement_country.textContent = pointsBelow_country;
+            }
+
+            if(totalGrantsElement_country){
+                totalGrantsElement_country.textContent = totalGrants_country;
             }
 
             //document.getElementById('pointsAbove_country').textContent = pointsAbove_country;
