@@ -145,7 +145,8 @@
             showLine: false, // Disable connecting line
             fullUniqueID: latestMonthsData.UniqueID[i], // Store full Unique ID for tooltip
             monthsRemaining: latestMonthsData.MonthsRemaining[i], //Store Months remaining for tooltip
-            Grantee: latestMonthsData.Grantee[i] //Store Grantee for Tooltip
+            Grantee: latestMonthsData.Grantee[i], //Store Grantee for Tooltip
+            Country: latestMonthsData.Country[i]
         }));
 
         function filterScatterData(timeFrame) {
@@ -419,7 +420,8 @@
                         `% Time Elapsed: ${xValue}`,
                         `% Obligation Spent: ${yValue}`,
                         `Months Remaining: ${dataset.monthsRemaining}`,
-                        `Grantee: ${dataset.Grantee}`
+                        `Grantee: ${dataset.Grantee}`,
+                        `Country: ${dataset.Country}`,
                         ];
                     }
                     }
