@@ -186,14 +186,14 @@ def latest_months_in_grants(grants):
         udo_c = pd.read_excel("GHC Grant Data Test.xlsx", skiprows=3, header=1)
         
         # Select relevant columns
-        udo_c_selected = udo_c[["Unique ID", "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date"]]
+        udo_c_selected = udo_c[["Unique ID", "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date", "Grantee"]]
         
         # Merge dataframes
         udo_combined = udo_ts.merge(udo_c_selected, how='left', on='Unique ID')
         udo_combined.sort_values(by=['Unique ID', 'Month'], axis=0, inplace=True, ignore_index=True)
         
         # Process data
-        obligation_progression = udo_combined[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable"]]
+        obligation_progression = udo_combined[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable", "Grantee"]]
         obligation_progression["Month"] = pd.to_datetime(obligation_progression["Month"], infer_datetime_format=True)
         obligation_progression["Grant End Date"] = pd.to_datetime(obligation_progression["Grant End Date"], infer_datetime_format=True)
         obligation_progression["Grant End Date EOM"] = obligation_progression["Grant End Date"] + pd.offsets.MonthEnd(0)
@@ -288,7 +288,8 @@ def latest_months_in_grants(grants):
             'UniqueID': latest_months_filtered['Unique ID'].tolist(),
             'GrantTimeElapsed': latest_months_filtered['Grant Time Elapsed'].tolist(),
             'ObligationSpent': latest_months_filtered['Obligation Spent'].tolist(),
-            'MonthsRemaining': latest_months_filtered['Months Remaining'].tolist()
+            'MonthsRemaining': latest_months_filtered['Months Remaining'].tolist(),
+            'Grantee': latest_months_filtered['Grantee'].tolist()
         }
 
         print(data)
