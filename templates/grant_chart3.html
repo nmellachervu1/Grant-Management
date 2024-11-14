@@ -82,6 +82,16 @@
         
         function createChart(data) {
             const ctx = document.getElementById('myChart').getContext('2d');
+
+            const lastX = overlayData.GrantTimeElapsed[overlayData.GrantTimeElapsed.length - 1];
+            const lastY = overlayData.ObligationSpent[overlayData.ObligationSpent.length - 1];
+
+            const obligationForecast = [
+                {x: lastX, y: lastY},
+                {x: lastX + 10, y: lastY + 5},
+                {x: lastX + 20, y: lastY + 10}        
+            ];
+
             const myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -97,6 +107,17 @@
                             pointRadius: 5,
                             borderDash: [10, 5], // Dashed line
                             order: 0 // Bring to front
+                        },
+                        {
+                            label: 'Obligation Forecast',
+                            data: obligationForecast,
+                            backgroundColor: 'rgba(255, 255, 0, 0.5)',
+                            borderColor: 'rgba(255, 255, 0, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 5,
+                            borderRadius: [5,0]
+
                         },
                         {
                             label: 'Average Liquidation Rate',
