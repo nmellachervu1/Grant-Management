@@ -613,9 +613,9 @@ def generate_country_graph_without_overlay(Country_Name):
 
         # Apply rolling window to smooth the data
         if Country_Name == 'GLOBAL':
-            window = 25
+            window = 35
         else:
-            window = 10
+            window = 20
         
         avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=window).mean().tolist()
 
