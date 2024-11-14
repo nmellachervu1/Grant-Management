@@ -48,6 +48,12 @@ Mozambique_grants = [
     '23NU2GGH0024629390FKR2023', '20NU2HGH000051C69390JFD2022', '20NU2HGH000051C39390GBN2022', '21NU2GGH00237222C39390GAP2022', '21NU2GGH002372PEC69390J6U2022', '22NU2GGH0024019390FKR2023', '20NU2HGH0000519390K202022'
 ]
 
+Global_grants= [
+    '20NU2GGH0023029390FKV2021', '21NU2GGH00235022PEC69390J6V2022', '19NU2GGH00219423HOP9390HEC2022',
+    '19NU2GGH00219419HQTB9390FKV2020', '21NU2GGH0023789390K872023', '22NU2GGH0024369390HD32022', '20NU2HGH000006C39390GAM2021', '20NU2GGH00231221C39390G802021', '21NU2HGH000088C39390GDP2021',
+    '20NU2HGH0000049390EQL2020', '20NU2HGH00000693906BX2021', '20NU2HGH000077C39390GFF2021', '20NU2HGH000072CV9390ETK2020', '20NU2HGH000072C39390GE32021', 
+    '20NU2HGH000077EBOLCV9390GUA2021', '23NU2GGH0024629390FKR2023', '20NU2HGH000051C69390JFD2022', '20NU2HGH000051C39390GBN2022', '21NU2GGH00237222C39390GAP2022', '21NU2GGH002372PEC69390J6U2022', '22NU2GGH0024019390FKR2023', '20NU2HGH0000519390K202022'
+]
 
 @app.route("/")
 def index():
@@ -72,6 +78,26 @@ def grant():
         #print(avg_line)
         return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country)
     return render_template("grant_js_form.html", grants=grants)
+
+@app.route("/global_portfolio")
+def portfolio_global():
+    #data = generate_graph_without_overlay()
+    country = "GLOBAL"
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(Global_grants)
+    country_area_data, avg_line = generate_country_graph_without_overlay(country)
+    #print(latest_months_data)
+    if isinstance(area_data, tuple):
+        return area_data[0], area_data[1]
+    #return render_template("SA.html", data=data)
+    # Render the template with the generated data
+
+    # Formatting
+    #total_obligations = "${:,.0f}".format(total_obligations)
+    #total_liquidated = "${:,.0f}".format(total_liquidated)
+
+    remaining_obligations = total_obligations - total_liquidated
+
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Global", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
 @app.route("/SA")
 def portfolio_SA():
@@ -569,9 +595,10 @@ def generate_country_graph_without_overlay(Country_Name):
         # Step 3: Filter the DataFrame to include only these UIDs
         filtered_obligation_progression = obligation_progression[obligation_progression['Unique ID'].isin(uids_with_more_than_2_records)]
 
-        filtered_obligation_progression1 = filtered_obligation_progression[filtered_obligation_progression['Country'] == Country_Name]
+        if Country_Name != 'GLOBAL':
+            filtered_obligation_progression = filtered_obligation_progression[filtered_obligation_progression['Country'] == Country_Name]
 
-        obligation_progression = filtered_obligation_progression1
+        obligation_progression = filtered_obligation_progression
 
         udo_progression = obligation_progression[obligation_progression["UDO Status"] == "ULO"]
         non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non ULO"]
@@ -585,7 +612,12 @@ def generate_country_graph_without_overlay(Country_Name):
         }
 
         # Apply rolling window to smooth the data
-        avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=10).mean().tolist()
+        if Country_Name == 'GLOBAL':
+            window = 25
+        else:
+            window = 10
+        
+        avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=window).mean().tolist()
 
         # Train model for UDO
         X = udo_progression[["Grant Time Elapsed"]]
