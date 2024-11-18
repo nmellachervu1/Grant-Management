@@ -2,7 +2,41 @@
 
 
 {% block body %}
-<div class="container">
-</div>
+<div class="d-flex vh-100">
+    <div class="container align-self-center">
+      <div class="row">
+        <div class="col-sm-4 mb-3">
+          <div class="card text-center">
+            <i class="bi bi-globe d-block mx-auto" style="font-size: 5rem; color: #007bff;"></i>
+            <div class="card-body">
+              <h5 class="card-title">Global Portfolio</h5>
+              <p class="card-text">Detailed global overview of fund allocations, identifying unliquidated obligations</p>
+              <a href="/global_portfolio" class="btn btn-primary">Go to Global Portfolio</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 mb-3">
+          <div class="card text-center">
+            <i class="bi bi-globe-europe-africa d-block mx-auto" style="font-size: 5rem; color: #007bff;"></i>
+            <div class="card-body">
+              <h5 class="card-title">Country Portfolios</h5>
+              <p class="card-text">Analyze country specific spending trends and identify risks of funding lapses</p>
+              <a href="/SA" class="btn btn-primary">Go to South Africa's Portfolio</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 mb-3">
+          <div class="card text-center">
+            <i class="bi bi-graph-up-arrow d-block mx-auto" style="font-size: 5rem; color: #007bff;"></i>
+            <div class="card-body">
+              <h5 class="card-title">Grant Tool</h5>
+              <p class="card-text">Analyze specific grants historical trend against averages and predictions</p>
+              <a href="/grant" class="btn btn-primary">Go to Grant Tool</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock%}
 
