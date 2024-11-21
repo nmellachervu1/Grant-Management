@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+
+    <div class="container">
+        <h1>AI Summary</h1>
+        <div class="summary">
+            <!-- The summary text will be injected here by your Flask application -->
+            {{ summary }}
+        </div>
+        <a href="/AI">Go back</a>
+    </div>
+
+{% endblock%}

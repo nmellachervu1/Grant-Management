@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+<form action="/AI" method="POST">
+    <label for="summaryInput">Enter Text:</label>
+    <input type="text" id="summaryInput" name="summaryInput">
+    <input type="submit" value="Submit">
+</form>
+{% endblock%}

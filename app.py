@@ -16,6 +16,24 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
+#Langchain AI
+from dotenv import load_dotenv
+import os
+import getpass
+
+load_dotenv()
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["OPENAI_API_KEY"] = "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"
+
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+
+class Document:
+    def __init__(self, content):
+        self.page_content = content
+        self.metadata = {}
+
 # Set the matplotlib backend to 'Agg'
 plt.switch_backend('Agg')
 
@@ -58,6 +76,15 @@ Global_grants= [
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/AI", methods=["GET", "POST"])
+def ai_summary():
+    if request.method == "POST":
+        request_text = request.form.get("summaryInput")
+        summary = ai_summary(request_text)
+        #print(summary)
+        return render_template("ai_output.html", summary = summary)
+    return render_template("ai_input.html")
 
 @app.route("/grant_old", methods=["GET", "POST"])
 def grant_old():
@@ -178,6 +205,30 @@ def portfolio_Mozambique():
     remaining_obligations = total_obligations - total_liquidated
 
     return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Mozambique", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
+
+def ai_summary(docs):
+    try: 
+        from langchain.chains.combine_documents import create_stuff_documents_chain
+        from langchain.chains.llm import LLMChain
+        from langchain_core.prompts import ChatPromptTemplate
+
+        # Define prompt
+        prompt = ChatPromptTemplate.from_messages(
+            [("system", "Write a concise summary of the following:\\n\\n{context}")]
+        )
+
+        # Instantiate chain
+        chain = create_stuff_documents_chain(llm, prompt)
+
+        # Convert input text to the expected format
+        document_objects = [Document(content=docs)]
+
+        # Invoke chain
+        result = chain.invoke({"context": document_objects})
+        return result
+
+    except Exception as e:
+        return str(e), 500
 
 def latest_months_in_grants(grants):
     try:
