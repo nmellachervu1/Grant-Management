@@ -26,6 +26,20 @@
     <canvas id="myChart" width="300" height="150" aria-label="Chart showing UDO and Non-UDO Disbursement Patterns" role="img"></canvas>
 </div>
 
+<div class="container-md mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">OpenAI Summary</h5>
+                    <p class="card-text">
+                        The graph displays the latest data on grant spending against time elapsed. It highlights three grants within the red shaded area, indicating they require intervention. Of these, one grant has less than 50% time elapsed, suggesting that reminders and follow-ups should be conducted. The other two grants have more than 50% time elapsed, necessitating actions like pulling back funds or amending future obligations. Additionally, while 10 grants are performing above the average liquidation rate, 11 grants, including those needing intervention, fall below this average. This suggests a broader review and monitoring may be necessary to ensure optimized spending and fulfill grant obligations promptly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <!-- Bootstrap Card for Total Obligations -->
 <div class="container text-center">
     <div class="row">
@@ -345,8 +359,8 @@
                 {
                     label: 'Average Liquidation Rate',
                     data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x, y: avgObligationSpent.ObligationSpent[i] })),
-                    backgroundColor: 'rgba(255, 0, 0, 0.5)',
-                    borderColor: 'rgba(255, 0, 0, 1)',
+                    backgroundColor: 'rgba(0, 0, 255, 0.5)',
+                    borderColor: 'rgba(0, 0, 255, 1)',
                     borderWidth: 2,
                     fill: false,
                     pointRadius: 0,
