@@ -22,8 +22,29 @@
 </div>
 
 <div class="container-md mt-4">
-    <h5> {{country}} Portfolio of Grants' Latest Month against Disbursement Patterns</h5>
-    <canvas id="myChart" width="300" height="150" aria-label="Chart showing UDO and Non-UDO Disbursement Patterns" role="img"></canvas>
+    <h5>{{ country }} Portfolio of Grants' Latest Month against Disbursement Patterns</h5>
+        <div class="d-flex">
+            <!-- Chart Section -->
+                <div class="flex-grow-1">
+                    <canvas id="myChart" width="300" height="150" aria-label="Chart showing UDO and Non-UDO Disbursement Patterns" role="img"></canvas>
+                </div>
+                    <!-- Description Card Section -->
+                <div class="ms-3" style="width: 250px;">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body">
+                            <h5 class="card-title">Graph Details</h5>
+                            <p class="card-text">
+                            The graph illustrates key metrics:
+                                <ul>
+                                    <li><strong>Data Points:</strong> Represent individual grants' latest obligation spent, color-coded for uniqueness.</li>
+                                    <li><strong>Red Shaded Areas:</strong> Historical area pattern for grants that resulted in UDO, indicates a need for intervention.</li>
+                                    <li><strong>Blue Average Line:</strong> Shows the rolling average obligation spent across all grants.</li>
+                                </ul>
+                            </p>
+                        </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="container-md mt-4">
