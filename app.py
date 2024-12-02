@@ -4,7 +4,7 @@
 # In[5]:
 
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import pandas as pd
 import numpy as np
 import datetime as dt
@@ -23,7 +23,7 @@ import getpass
 
 load_dotenv()
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["OPENAI_API_KEY"] = ""
+os.environ["OPENAI_API_KEY"] = "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"
 
 from langchain_openai import ChatOpenAI
 
@@ -85,6 +85,18 @@ def ai_summary():
         #print(summary)
         return render_template("ai_output.html", summary = summary)
     return render_template("ai_input.html")
+
+@app.route("/generate-summary", methods=["GET", "POST"])
+def generate_summary():
+    try: 
+        data = request.get_json()
+        prompt = data.get("prompt")
+
+        summary = ai_summary(prompt)
+
+        return jsonify({"summary": summary})
+    except Exception as e :
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/grant_old", methods=["GET", "POST"])
 def grant_old():

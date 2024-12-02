@@ -53,7 +53,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">GenAI Summary</h5>
-                    <p class="card-text">
+                    <p class="card-text", id="genai-summary">
                         The graph displays the latest data on grant spending against time elapsed. It highlights three grants within the red shaded area, indicating they require intervention. Of these, one grant has less than 50% time elapsed, suggesting that reminders and follow-ups should be conducted. The other two grants have more than 50% time elapsed, necessitating actions like pulling back funds or amending future obligations. Additionally, while 10 grants are performing above the average liquidation rate, 11 grants, including those needing intervention, fall below this average. This suggests a broader review and monitoring may be necessary to ensure optimized spending and fulfill grant obligations promptly.
                     </p>
                 </div>
@@ -368,6 +368,62 @@
         calculatePointsAboveBelow_global();
         calculatePointsAboveBelow_country();
 
+        function fetchAndDisplaySummary(prompt) {
+            console.log(prompt);
+            fetch('/generate-summary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+                })
+                .then(response => response.json())
+                .then(data => {
+            const summaryElement = document.getElementById('genai-summary');
+            if (summaryElement) {
+                        summaryElement.textContent = data.summary || "No summary available.";
+                    } else {
+                        console.error('Summary element not found!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching summary:', error);
+            const summaryElement = document.getElementById('genai-summary');
+            if (summaryElement) {
+                        summaryElement.textContent = "An error occurred while fetching the summary.";
+                    }
+                });
+        }
+
+        function generatePromptFromGraph(isGlobal, filteredScatterDatasets) {
+            const totalGrantsElement = isGlobal ? document.getElementById('totalGrants_global') : document.getElementById('totalGrants_country');
+            const pointsAboveElement = isGlobal ? document.getElementById('pointsAbove_global') : document.getElementById('pointsAbove_country');
+            const pointsBelowElement = isGlobal ? document.getElementById('pointsBelow_global') : document.getElementById('pointsBelow_country');
+        
+            const totalGrants = totalGrantsElement ? totalGrantsElement.textContent : 0;
+            const pointsAbove = pointsAboveElement ? pointsAboveElement.textContent : 0;
+            const pointsBelow = pointsBelowElement ? pointsBelowElement.textContent : 0;
+        
+            const dataPoints = filteredScatterDatasets.map(dataset => 
+                `ID: ${dataset.fullUniqueID}, X: ${dataset.data[0].x}, Y: ${dataset.data[0].y}`
+            ).join('\n');
+        
+            return `Provide a detailed summary of the graph data and trends based on the following:
+            ### Data Overview:
+            - Total Grants: ${totalGrants}
+            - Points Above Pattern: ${pointsAbove}
+            - Points Below Pattern: ${pointsBelow}
+            ### Data Details:
+            ${dataPoints}
+            ### Additional Information:
+            - The data being analyzed is ${isGlobal ? "global" : "country-specific"}.
+            - Key observations should highlight how the points above and below the pattern reflect trends in ${isGlobal ? "global" : "country-specific"} obligations.`;
+        }
+
+        function updateSummary(isGlobal, filteredScatterDatasets) {
+            //const selectedData = isGlobal ? data_global : data_country;
+            const promptData = generatePromptFromGraph(isGlobal, filteredScatterDatasets);
+            fetchAndDisplaySummary(promptData);
+        }
+
         // Function to create chart
         function createChart(data, scatterDatasets) {
             const ctx = document.getElementById('myChart').getContext('2d');
@@ -520,6 +576,8 @@
             } else {
                 calculatePointsAboveBelow_country(filteredScatterDatasets);
             }
+
+            updateSummary(isGlobal, filteredScatterDatasets);
         });
 
         //initially show global data
@@ -543,6 +601,8 @@
             } else {
                 calculatePointsAboveBelow_country(filteredScatterDatasets);
             }
+
+            updateSummary(isGlobal, filteredScatterDatasets);
         });
     });
 </script>
