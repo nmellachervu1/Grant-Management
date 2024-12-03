@@ -406,14 +406,16 @@
                 `ID: ${dataset.fullUniqueID}, X: ${dataset.data[0].x}, Y: ${dataset.data[0].y}`
             ).join('\n');
         
-            return `Provide a detailed summary of the graph data and trends based on the following:
-            ### Data Overview:
+            return `
+            Data Overview:
             - Total Grants: ${totalGrants}
             - Points Above Pattern: ${pointsAbove}
-            - Points Below Pattern: ${pointsBelow}
-            ### Data Details:
+            - Less Than %100 Percent Liquidation Pattern (Red Shaded Area): ${pointsBelow}
+
+            Data Details:
             ${dataPoints}
-            ### Additional Information:
+
+            Additional Information:
             - The data being analyzed is ${isGlobal ? "global" : "country-specific"}.
             - Key observations should highlight how the points above and below the pattern reflect trends in ${isGlobal ? "global" : "country-specific"} obligations.`;
         }
