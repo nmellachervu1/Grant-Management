@@ -23,7 +23,7 @@ import getpass
 
 load_dotenv()
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = ""
 
 from langchain_openai import ChatOpenAI
 
