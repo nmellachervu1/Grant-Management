@@ -397,6 +397,9 @@
             const totalGrantsElement = isGlobal ? document.getElementById('totalGrants_global') : document.getElementById('totalGrants_country');
             const pointsAboveElement = isGlobal ? document.getElementById('pointsAbove_global') : document.getElementById('pointsAbove_country');
             const pointsBelowElement = isGlobal ? document.getElementById('pointsBelow_global') : document.getElementById('pointsBelow_country');
+
+            const redArea = isGlobal ? "Global Area Data" : `${country} Area Data`;
+
         
             const totalGrants = totalGrantsElement ? totalGrantsElement.textContent : 0;
             const pointsAbove = pointsAboveElement ? pointsAboveElement.textContent : 0;
@@ -417,7 +420,10 @@
 
             Additional Information:
             - The data being analyzed is ${isGlobal ? "global" : "country-specific"}.
-            - Key observations should highlight how the points above and below the pattern reflect trends in ${isGlobal ? "global" : `country-specific (${country})`} obligations.`;
+            - Key observations should highlight how the points above and below the pattern reflect trends in ${isGlobal ? "global" : `country-specific (${country})`} obligations.
+            - The Red Shaded Area lines are calculated using ${redArea}.
+            `;
+            
         }
 
         function updateSummary(isGlobal, filteredScatterDatasets) {
