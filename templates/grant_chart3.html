@@ -14,6 +14,23 @@
     <canvas id="myChart" width="300" height="150" aria-label="Chart showing UDO and Non-UDO Disbursement Patterns" role="img"></canvas>
 </div>
 
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card mt-4">
+                <div class="card-header" style= "font-weight: bold;">
+                        Generative AI Summary
+                </div>
+                <div class="card-body">
+                    <p class="card-text", id="genai-summary">
+                        The graph displays the latest data on grant spending against time elapsed. It highlights three grants within the red shaded area, indicating they require intervention. Of these, one grant has less than 50% time elapsed, suggesting that reminders and follow-ups should be conducted. The other two grants have more than 50% time elapsed, necessitating actions like pulling back funds or amending future obligations. Additionally, while 10 grants are performing above the average liquidation rate, 11 grants, including those needing intervention, fall below this average. This suggests a broader review and monitoring may be necessary to ensure optimized spending and fulfill grant obligations promptly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container text-center">
     <div class="row">
       <div class="col">
@@ -231,6 +248,8 @@
             // Create a new chart with the selected data
             currentChart = createChart(selectedData);
         });
+
+
     });
 </script>
 {% endblock %}
