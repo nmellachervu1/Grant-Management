@@ -257,7 +257,7 @@
             // Create a new chart with the selected data
             currentChart = createChart(selectedData);
 
-            updateSummary(isGlobal, overlayData);
+            updateSummary(isGlobal, overlayData, selectedData);
         });
 
         function fetchAndDisplaySummary(prompt) {
@@ -285,10 +285,11 @@
                 });
         }
 
-        function generatePromptFromGraph(isGlobal, overlayData) {
+        function generatePromptFromGraph(isGlobal, overlayData, selectedData) {
 
             const redArea = isGlobal ? "Global Area Data" : `${country} Area Data`;
             const trendInfo = overlayData.GrantTimeElapsed.map((x, i) => `(${x}, ${overlayData.ObligationSpent[i]})`).join(", ");
+            const selectedDataTrendInfo = selectedData.GrantTimeElapsed.map((x, i) => `(${x}, ${selectedData.UDOPredictedLevel[i]})`).join(", ");
 
         
             return `
@@ -296,12 +297,15 @@
             - Grantee: ${grantee}
             - Grant Name: ${grant_name}
             - Obligation in Dollars: ${grant_obligation}
+            - Obligation Liquidated (Spent) in Dollars: ${grant_liquidated}
             - Current UDO in Dollars: ${grant_udo}
             - Remaining Months: ${months_remaining}
-            - Liquidated in Dollars: ${grant_liquidated}
 
             Grant Trend Data:
             ${trendInfo}
+
+            Red Shaded Area Data:
+            ${selectedDataTrendInfo}
             
             Additional Information:
             - The data being analyzed is ${isGlobal ? "global" : "country-specific"}.
@@ -311,9 +315,9 @@
             
         }
 
-        function updateSummary(isGlobal, overlayData) {
+        function updateSummary(isGlobal, overlayData, selectedData) {
             //const selectedData = isGlobal ? data_global : data_country;
-            const promptData = generatePromptFromGraph(isGlobal, overlayData);
+            const promptData = generatePromptFromGraph(isGlobal, overlayData, selectedData);
             fetchAndDisplaySummary(promptData);
         }
 
