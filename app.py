@@ -27,7 +27,7 @@ os.environ["OPENAI_API_KEY"] = ""
 
 from langchain_openai import ChatOpenAI
 
-llm = ChatOpenAI(model="gpt-4o-mini")
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
 
 class Document:
     def __init__(self, content):
@@ -238,7 +238,7 @@ def ai_summary(docs):
 
         # Define prompt
         prompt = ChatPromptTemplate.from_messages(
-            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph that has __ points that represent the latest % Obligation Spent across the % Elapsed Time of grants. These points are different color dots that each represent a unique grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. If a grant falls within/below this red shaded area, these grants need intervention. The type of intervention depends on the % Time Elapsed of the Grant. If the grant in the red shaded area has less than %50 Grant Time Elapsed, recommend having conversations, reminders and follow ups. If the grant in the red shaded area has more than %50 Grant Time Elapsed, recommend pulling back money and/or amending future obligations. Make sure to mention how the Red Shaded Areas are being calculated. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context}")]
+            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph that has __ points that represent the latest Percent Obligation Spent across the Percent Elapsed Time of grants. These points are different color dots that each represent a unique grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. If a grant falls within/below this red shaded area, these grants need intervention. The type of intervention depends on the % Time Elapsed of the Grant. Check to see the grants time elapsed and then, if the grant in the red shaded area has less than %50 Grant Time Elapsed, recommend having conversations, reminders and follow ups. If the grant in the red shaded area has more than %50 Grant Time Elapsed, recommend pulling back money and/or amending future obligations. Make sure to mention how the Red Shaded Areas are being calculated. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context}")]
         )
 
         # Instantiate chain

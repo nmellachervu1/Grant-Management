@@ -246,7 +246,7 @@
 
         // Event listener for data selector
         document.getElementById('dataSelector').addEventListener('change', function(event) {
-            //const isGlobal = event.target.value === 'data_global';
+            const isGlobal = event.target.value === 'data_global';
             const selectedData = event.target.value === 'data_global' ? data_global : data_country;
             
             // Destroy the current chart instance

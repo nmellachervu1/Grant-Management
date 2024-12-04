@@ -411,7 +411,7 @@
             const pointsBelow = pointsBelowElement ? pointsBelowElement.textContent : 0;
         
             const dataPoints = filteredScatterDatasets.map(dataset => 
-                `ID: ${dataset.fullUniqueID}, X: ${dataset.data[0].x}, Y: ${dataset.data[0].y}`
+                `ID: ${dataset.fullUniqueID}, % Time Elapsed: ${dataset.data[0].x}, % Obligation Spent: ${dataset.data[0].y}`
             ).join('\n');
         
             return `
