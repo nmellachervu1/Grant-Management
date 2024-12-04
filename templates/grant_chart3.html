@@ -96,7 +96,15 @@
         const overlayData = {{ grant_data|tojson }};
         const data_country = {{ country_area_data|tojson }};
         const avgObligationSpent = {{ avg_line|tojson }};
-        
+        const country = "{{ country }}";
+        const grantee = "{{ grantee }}";
+        const grant_name = "{{ grant_name }}";
+        const grant_obligation = "{{ grant_obligation }}";
+        const months_remaining = "{{ months_remaining }}";
+        const grant_liquidated = "{{ grant_liquidated }}";
+        const grant_udo = "{{ grant_udo }}";
+
+
         function createChart(data) {
             const ctx = document.getElementById('myChart').getContext('2d');
 
@@ -238,7 +246,8 @@
 
         // Event listener for data selector
         document.getElementById('dataSelector').addEventListener('change', function(event) {
-            const selectedData = event.target.value === 'data_global' ? data_global : data_country;
+            const isGlobal = event.target.value === 'data_global';
+            const selectedData = event.target.value === isGlobal ? data_global : data_country;
             
             // Destroy the current chart instance
             if(currentChart){
@@ -247,7 +256,61 @@
             
             // Create a new chart with the selected data
             currentChart = createChart(selectedData);
+
+            updateSummary(isGlobal);
         });
+
+        function fetchAndDisplaySummary(prompt) {
+            console.log(prompt);
+            fetch('/generate-summary-grant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+                })
+                .then(response => response.json())
+                .then(data => {
+            const summaryElement = document.getElementById('genai-summary');
+            if (summaryElement) {
+                        summaryElement.textContent = data.summary || "No summary available.";
+                    } else {
+                        console.error('Summary element not found!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching summary:', error);
+            const summaryElement = document.getElementById('genai-summary');
+            if (summaryElement) {
+                        summaryElement.textContent = "An error occurred while fetching the summary.";
+                    }
+                });
+        }
+
+        function generatePromptFromGraph(isGlobal) {
+
+            const redArea = isGlobal ? "Global Area Data" : `${country} Area Data`;
+        
+            return `
+            Grant Overview:
+            - Grantee: ${grantee}
+            - Grant Name: ${grant_name}
+            - Obligation in Dollars: ${grant_obligation}
+            - Current UDO in Dollars: ${grant_udo}
+            - Remaining Months: ${months_remaining}
+            - Liquidated in Dollars: ${grant_liquidated}
+            
+            Additional Information:
+            - The data being analyzed is ${isGlobal ? "global" : "country-specific"}.
+            - Key observations should highlight how the points above and below the pattern reflect trends in ${isGlobal ? "global" : `country-specific (${country})`} obligations.
+            - The Red Shaded Area lines are calculated using ${redArea}.
+            `;
+            
+        }
+
+        function updateSummary(isGlobal) {
+            //const selectedData = isGlobal ? data_global : data_country;
+            const promptData = generatePromptFromGraph(isGlobal);
+            fetchAndDisplaySummary(promptData);
+        }
 
 
     });
