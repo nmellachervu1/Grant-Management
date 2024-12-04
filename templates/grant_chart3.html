@@ -257,7 +257,7 @@
             // Create a new chart with the selected data
             currentChart = createChart(selectedData);
 
-            updateSummary(isGlobal);
+            updateSummary(isGlobal, overlayData);
         });
 
         function fetchAndDisplaySummary(prompt) {
@@ -285,9 +285,11 @@
                 });
         }
 
-        function generatePromptFromGraph(isGlobal) {
+        function generatePromptFromGraph(isGlobal, overlayData) {
 
             const redArea = isGlobal ? "Global Area Data" : `${country} Area Data`;
+            const trendInfo = overlayData.GrantTimeElapsed.map((x, i) => `(${x}, ${overlayData.ObligationSpent[i]})`).join(", ");
+
         
             return `
             Grant Overview:
@@ -297,6 +299,9 @@
             - Current UDO in Dollars: ${grant_udo}
             - Remaining Months: ${months_remaining}
             - Liquidated in Dollars: ${grant_liquidated}
+
+            Grant Trend Data:
+            ${trendInfo}
             
             Additional Information:
             - The data being analyzed is ${isGlobal ? "global" : "country-specific"}.
@@ -306,9 +311,9 @@
             
         }
 
-        function updateSummary(isGlobal) {
+        function updateSummary(isGlobal, overlayData) {
             //const selectedData = isGlobal ? data_global : data_country;
-            const promptData = generatePromptFromGraph(isGlobal);
+            const promptData = generatePromptFromGraph(isGlobal, overlayData);
             fetchAndDisplaySummary(promptData);
         }
 
