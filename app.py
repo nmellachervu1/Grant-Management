@@ -77,6 +77,10 @@ Global_grants= [
 def index():
     return render_template("index.html")
 
+@app.route("/Help")
+def help():
+    return render_template("help.html")
+
 @app.route("/AI", methods=["GET", "POST"])
 def ai_summary():
     if request.method == "POST":
@@ -240,7 +244,7 @@ def ai_summary(docs):
 
         # Define prompt
         prompt = ChatPromptTemplate.from_messages(
-            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph that has __ points that represent the latest Percent Obligation Spent across the Percent Elapsed Time of grants. These points are different color dots that each represent a unique grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. If a grant falls within/below this red shaded area, these grants need intervention. Make sure to mention how the Red Shaded Areas are being calculated. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context}. Reference this template: \\n\\n{template}")]
+            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph that has __ points that represent the latest Percent Obligation Spent across the Percent Elapsed Time of grants. These points are different color dots that each represent a unique grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. If a grant falls within/below this red shaded area, these grants need intervention. Make sure to mention how the Red Shaded Areas are being calculated. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context}. \\n Reference this template: \\n\\n{template}")]
         )
 
         # Instantiate chain
