@@ -236,9 +236,11 @@ def ai_summary(docs):
         from langchain.chains.llm import LLMChain
         from langchain_core.prompts import ChatPromptTemplate
 
+        template = "In the analysis of 22 grants, 3 grants fall within the red shaded area, indicating they will likely have a large unliquidated balance. Recommend intervention from Project officers or program leaders due to their expected high unliquidated balance. Additionally, grants obligations older than 2.5 years (over 50%) require proactive engagement and follow-ups to facilitate efficient liquidation or de-obligation of 19 out of the 22 grants exhibit normal liquidation rate and will likely end with minimal or no unliquidated balance. "
+
         # Define prompt
         prompt = ChatPromptTemplate.from_messages(
-            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph that has __ points that represent the latest Percent Obligation Spent across the Percent Elapsed Time of grants. These points are different color dots that each represent a unique grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. If a grant falls within/below this red shaded area, these grants need intervention. The type of intervention depends on the % Time Elapsed of the Grant. Without specifically referencing each grant, mention that grants in the red shaded area with less than %50 Grant Time Elapsed require having conversations, reminders and follow ups and grants with more than %50 Grant Time Elapsed require pulling back money and/or amending future obligations. Make sure to mention how the Red Shaded Areas are being calculated. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context}")]
+            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph that has __ points that represent the latest Percent Obligation Spent across the Percent Elapsed Time of grants. These points are different color dots that each represent a unique grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. If a grant falls within/below this red shaded area, these grants need intervention. Make sure to mention how the Red Shaded Areas are being calculated. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context}. Reference this template: \\n\\n{template}")]
         )
 
         # Instantiate chain
@@ -248,7 +250,7 @@ def ai_summary(docs):
         document_objects = [Document(content=docs)]
 
         # Invoke chain
-        result = chain.invoke({"context": document_objects})
+        result = chain.invoke({"context": document_objects, "template": template})
         return result
 
     except Exception as e:
