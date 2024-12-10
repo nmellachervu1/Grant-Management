@@ -2,10 +2,67 @@
 
 {% block body %}
 <div class="container">
-    <h1>{{ grant_status }}</h1>
-    <img src="data:image/png;base64,{{ img_base64 }}" alt="Graph">
-    <br>
-    <br>
-    <a href="{{ url_for('index') }}">Go Back</a>
+    <div id="message" class="centered-message">Select a guide</div>
+    <div class="dropdown-container">
+        <label for="guideSelect">Select a Help Guide:</label>
+        <select id="guideSelect" onchange="updateImage()">
+            <option value="none">None</option>
+            <option value="Global_Port_Guide.png">Global Port Guide</option>
+            <option value="Another_Guide.png">Another Guide</option>
+            <option value="Third_Guide.png">Third Guide</option>
+        </select>
+    </div>
+    <div class="image-container">
+        <img id="guideImage" src="" class="image" style="display:none;" />
+    </div>
 </div>
+
+<script>
+    function updateImage() {
+        var select = document.getElementById("guideSelect");
+        var selectedValue = select.options[select.selectedIndex].value;
+        var image = document.getElementById("guideImage");
+        var message = document.getElementById("message");
+
+        if (selectedValue === "none") {
+            image.style.display = "none";
+            message.style.display = "block";
+            message.innerText = "Select a guide";
+        } else {
+            image.src = "{{ url_for('static', filename='images/') }}" + selectedValue;
+            image.style.display = "block";
+            message.style.display = "none";
+        }
+    }
+</script>
+
+<style>
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.centered-message {
+    font-size: 2em; /* Make the message big */
+    color: #333; /* Optional: Set the text color */
+}
+
+.dropdown-container {
+    margin-top: 20px; /* Add some space between the message and the dropdown */
+}
+
+.image-container {
+    margin-top: 20px; /* Add some space between the dropdown and the image */
+}
+
+.image {
+    max-width: 100%; /* Ensure the image fits within the container */
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Center the image horizontally */
+}
+</style>
 {% endblock %}
