@@ -34,6 +34,24 @@ class Document:
         self.page_content = content
         self.metadata = {}
 
+def generate_torch_kwargs():
+    # run torch models on CPU, and disable progress bars for all model stages except training.
+    return {
+        "pl_trainer_kwargs": {
+            "accelerator": "cpu",
+            "callbacks": [TFMProgressBar(enable_train_bar_only=True)],
+        }
+    }
+
+from darts.models import (
+    VARIMA,
+    BlockRNNModel,
+    NBEATSModel,
+    RNNModel,
+)
+
+from darts.utils.callbacks import TFMProgressBar
+
 # Set the matplotlib backend to 'Agg'
 plt.switch_backend('Agg')
 
@@ -130,8 +148,13 @@ def grant():
         data, grant_data, grant_name2, grant_months_remaining, grantee, grant_obligation, grant_liquidated, grant_udo, udo_percentage, country = generate_graph_with_grant(grant_name)
         #print(country)
         country_area_data, avg_line = generate_country_graph_without_overlay(country)
+
+        print(grant_data)
+
+        forecast_data = run_model(grant_name)
+
         #print(avg_line)
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country, forecast_data = forecast_data)
     return render_template("grant_js_form.html", grants=grants)
 
 @app.route("/global_portfolio")
@@ -233,6 +256,113 @@ def portfolio_Mozambique():
     remaining_obligations = total_obligations - total_liquidated
 
     return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Mozambique", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
+
+#function to get the target time series
+def get_target_time_series(grant_to_forecast):
+    import joblib
+
+    # Load the scaled_grant_series dictionary from the file
+    scaled_grant_series = joblib.load('scaled_grant_series.pkl')
+
+    # Initialize dictionaries for train and validation sets
+    train_grant_series = []
+    val_grant_series = []
+
+    # Initialize variable to store the target time series
+    target_time_series = None
+    target_time_series_val = None
+
+    count = 0
+
+    # Loop through each series in grant_dfs
+    for grant_id, grant_series in scaled_grant_series.items():
+
+        # Check if the series length is at least 12
+        if len(grant_series) >= 24:
+
+            count+=1
+
+            # Split the series into train and validation sets
+            train_one, val_one = grant_series[:-6], grant_series[-6:]
+
+            # Store the split data in the respective lists
+            train_grant_series.append(train_one)
+            val_grant_series.append(val_one)
+
+            # Check if the current grant_id matches the target grant_id
+            if grant_id == grant_to_forecast:
+                target_time_series = train_one
+                target_time_series_val = val_one
+    
+    return target_time_series
+
+
+#Create function to use darts to load the NBEATS_2Epoch
+def run_model(grant_to_forecast):
+    from darts.models import NBEATSModel
+
+    model_name = "NBEATS_2Epoch"
+
+    model_one_two = NBEATSModel.load_from_checkpoint(model_name=model_name, best=False)
+
+    target_time_series = get_target_time_series(grant_to_forecast)
+
+    pred = model_one_two.predict(n=48, series=target_time_series)
+
+    # Altering Line
+    highest_pred = float('-inf')  # Initialize to negative infinity
+    new_values = []
+
+    for value in pred.values():
+        if value > highest_pred:
+            highest_pred = value
+        new_values.append(highest_pred)
+
+    # Create a new TimeSeries with the modified values
+    pred = pred.with_values(new_values)
+
+    pred = scale_preds(pred, grant_to_forecast)
+
+    print(pred)
+
+    #return nothing
+    return pred
+
+def scale_preds(pred, grant_to_forecast):
+    import joblib
+    # Load the scalers dictionary from the file
+    scalers = joblib.load('scalers.pkl')
+    grant_dfs = joblib.load('grant_dfs.pkl')
+
+    # Retrieve the scaler for a specific grant ID
+    grant_id = grant_to_forecast
+    scaler = scalers[grant_id]
+
+    # Use the scaler to unscale data
+    unscaled_data = scaler.inverse_transform(pred)
+
+
+    # Normalize data
+    #unscaled_data = unscaled_data / 17200000 * 100
+    # Normalize the actual data
+    grant_dfs_selected = grant_dfs[grant_to_forecast]
+
+    # Replace dates with index values
+    pred_df = unscaled_data.pd_dataframe().reset_index(drop=True)
+    scaled_grant_series_df = grant_dfs_selected.pd_dataframe().reset_index(drop=True)
+
+    #move the indexes of the pred_df to be -3 of the length of the scaled_grant_series_df
+    pred_df.index = pred_df.index + len(scaled_grant_series_df) - 3
+
+    # Divide x-axis by 60 to get percent
+    pred_df.index = pred_df.index / 60 * 100
+    scaled_grant_series_df.index = scaled_grant_series_df.index / 60 * 100
+
+    return pred_df
+
+
+
+
 
 def ai_summary(docs):
     try: 
