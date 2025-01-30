@@ -323,10 +323,15 @@ def run_model(grant_to_forecast):
 
     pred = scale_preds(pred, grant_to_forecast)
 
-    print(pred)
+    forecast_data = {
+        'GrantTimeElapsed': pred.index.tolist(),
+        'ObligationSpent': pred['Obligation Spent'].tolist(),
+    }
+
+    #print(forecast_data)
 
     #return nothing
-    return pred
+    return forecast_data
 
 def scale_preds(pred, grant_to_forecast):
     import joblib
@@ -357,6 +362,9 @@ def scale_preds(pred, grant_to_forecast):
     # Divide x-axis by 60 to get percent
     pred_df.index = pred_df.index / 60 * 100
     scaled_grant_series_df.index = scaled_grant_series_df.index / 60 * 100
+
+    #print the type of pred_df
+    #print(type(pred_df))
 
     return pred_df
 
