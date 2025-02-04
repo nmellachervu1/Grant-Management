@@ -62,7 +62,7 @@ grants = [
     '20NU2GGH0023029390FKV2021', '22R43GH0023699390JGK2022', '22R43GH0023899390JLL2022', '22R43GH002391CV9390JLL2022',
     '22R43GH002392CV9390JLL2022', '21NU2GGH0023399390FKN2021', '21NU2GGH0023399390HCW2021',
     '21R43GH00236793901A32021', '21R43GH002367939ZZMF2021', '21R43GH00236893901KB2021',
-    '21R43GH002368939ZZMF2021', '19NU2GGH00219423HOP9390HEC2022', '21NU2GGH0023789390K872023'
+    '21R43GH002368939ZZMF2021', '19NU2GGH00219423HOP9390HEC2022', '21NU2GGH0023789390K872023', '20NU2HGH000006C39390GAM2021', '20NU2GGH00231221C39390G802021'
 ]
 
 SA_grants = [
@@ -283,7 +283,7 @@ def get_target_time_series(grant_to_forecast):
             count+=1
 
             # Split the series into train and validation sets
-            train_one, val_one = grant_series[:-6], grant_series[-6:]
+            train_one, val_one = grant_series[:-12], grant_series[-12:]
 
             # Store the split data in the respective lists
             train_grant_series.append(train_one)
@@ -293,8 +293,11 @@ def get_target_time_series(grant_to_forecast):
             if grant_id == grant_to_forecast:
                 target_time_series = train_one
                 target_time_series_val = val_one
+                target_time_series_combined = grant_series
+
     
-    return target_time_series
+    #return target_time_series, 
+    return target_time_series_combined
 
 
 #Create function to use darts to load the NBEATS_2Epoch
@@ -304,6 +307,9 @@ def run_model(grant_to_forecast):
     model_name = "NBEATS_2Epoch"
 
     model_one_two = NBEATSModel.load_from_checkpoint(model_name=model_name, best=False)
+
+    #print grant_to_forecast to console
+    print("Grant to Forecast: ", grant_to_forecast)
 
     target_time_series = get_target_time_series(grant_to_forecast)
 
@@ -328,7 +334,7 @@ def run_model(grant_to_forecast):
         'ObligationSpent': pred['Obligation Spent'].tolist(),
     }
 
-    #print(forecast_data)
+    print(forecast_data)
 
     #return nothing
     return forecast_data
@@ -356,9 +362,10 @@ def scale_preds(pred, grant_to_forecast):
     pred_df = unscaled_data.pd_dataframe().reset_index(drop=True)
     scaled_grant_series_df = grant_dfs_selected.pd_dataframe().reset_index(drop=True)
 
-    #move the indexes of the pred_df to be -3 of the length of the scaled_grant_series_df
-    pred_df.index = pred_df.index + len(scaled_grant_series_df) - 3
-
+    # Increase the indexes of pred by the last index of the scaled_grant_series_df
+    last_index = scaled_grant_series_df.index[-1]
+    pred_df.index = pred_df.index + last_index + 12
+    
     # Divide x-axis by 60 to get percent
     pred_df.index = pred_df.index / 60 * 100
     scaled_grant_series_df.index = scaled_grant_series_df.index / 60 * 100
