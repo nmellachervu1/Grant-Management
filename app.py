@@ -173,6 +173,10 @@ def portfolio_global():
     #total_obligations = "${:,.0f}".format(total_obligations)
     #total_liquidated = "${:,.0f}".format(total_liquidated)
 
+    #save latest_months_data to excel
+    #latest_months_data_df = pd.DataFrame(latest_months_data)
+    #latest_months_data_df.to_excel("latest_months_data.xlsx")
+
     remaining_obligations = total_obligations - total_liquidated
 
     return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Global", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
@@ -313,7 +317,7 @@ def run_model(grant_to_forecast):
 
     target_time_series = get_target_time_series(grant_to_forecast)
 
-    pred = model_one_two.predict(n=48, series=target_time_series)
+    pred = model_one_two.predict(n=24, series=target_time_series)
 
     # Altering Line
     highest_pred = float('-inf')  # Initialize to negative infinity
@@ -327,7 +331,7 @@ def run_model(grant_to_forecast):
     # Create a new TimeSeries with the modified values
     pred = pred.with_values(new_values)
 
-    pred = scale_preds(pred, grant_to_forecast)
+    pred = scale_preds(pred, grant_to_forecast, target_time_series)
 
     forecast_data = {
         'GrantTimeElapsed': pred.index.tolist(),
@@ -339,7 +343,7 @@ def run_model(grant_to_forecast):
     #return nothing
     return forecast_data
 
-def scale_preds(pred, grant_to_forecast):
+def scale_preds(pred, grant_to_forecast, target_time_series):
     import joblib
     # Load the scalers dictionary from the file
     scalers = joblib.load('scalers.pkl')
@@ -362,9 +366,16 @@ def scale_preds(pred, grant_to_forecast):
     pred_df = unscaled_data.pd_dataframe().reset_index(drop=True)
     scaled_grant_series_df = grant_dfs_selected.pd_dataframe().reset_index(drop=True)
 
+    #get last 
+    target_time_series = scaler.inverse_transform(target_time_series)
+    target_time_series = target_time_series.pd_dataframe().reset_index(drop=True)
+
+    print("TARGET:",target_time_series)
+
     # Increase the indexes of pred by the last index of the scaled_grant_series_df
-    last_index = scaled_grant_series_df.index[-1]
-    pred_df.index = pred_df.index + last_index + 12
+    last_index = target_time_series.index[-1]
+
+    pred_df.index = pred_df.index + scaled_grant_series_df.index[-1] + 12
     
     # Divide x-axis by 60 to get percent
     pred_df.index = pred_df.index / 60 * 100
