@@ -176,6 +176,7 @@ def portfolio_global():
     #save latest_months_data to excel
     #latest_months_data_df = pd.DataFrame(latest_months_data)
     #latest_months_data_df.to_excel("latest_months_data.xlsx")
+    #print(area_data)
 
     remaining_obligations = total_obligations - total_liquidated
 

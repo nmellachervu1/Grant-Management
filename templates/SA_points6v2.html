@@ -214,6 +214,11 @@
             Country: latestMonthsData.Country[i]
         }));
 
+        //divide scatterDatasets x-axis by 12
+        scatterDatasets.forEach(dataset => {
+            dataset.data[0].x = dataset.data[0].x * 60 / 12 * 0.01;
+        });
+
         function filterScatterData(timeFrame) {
             let filteredDatasets;
 
@@ -473,7 +478,7 @@
                 ...scatterDatasets,
                 {
                     label: 'Average Liquidation Rate',
-                    data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x, y: avgObligationSpent.ObligationSpent[i] })),
+                    data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x * 60 / 12 * 0.01, y: avgObligationSpent.ObligationSpent[i] })),
                     backgroundColor: 'rgba(0, 0, 255, 0.5)',
                     borderColor: 'rgba(0, 0, 255, 1)',
                     borderWidth: 2,
@@ -483,7 +488,7 @@
                 },
                 {
                     label: 'Less Than 100% Liquidation Pattern',
-                    data: data.UDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i], y: y })),
+                    data: data.UDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i] * 60 / 12 * 0.01, y: y })),
                     backgroundColor: 'rgba(255, 153, 153, 0.5)',
                     borderColor: 'rgba(255, 153, 153, 1)',
                     borderWidth: 0.10,
@@ -491,7 +496,7 @@
                 },
                 {
                     label: '100% Liquidation Pattern',
-                    data: data.NonUDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i], y: y })),
+                    data: data.NonUDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i] * 60 / 12 * 0.01, y: y })),
                     backgroundColor: 'rgba(153, 204, 255, 0.5)',
                     borderColor: 'rgba(153, 204, 255, 1)',
                     borderWidth: 0.25,
