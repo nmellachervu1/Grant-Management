@@ -510,13 +510,17 @@
                     type: 'linear',
                     title: {
                     display: true,
-                    text: 'X Axis: % of Grant Time Elapsed',
+                    text: 'X Axis: Year',
                     font: { size: 20 }
                     },
                     ticks: {
                     font: { size: 20 },
                     min: 0,
-                    max: 100
+                    max: 5,
+                    stepSize: 1,
+                    callback: function(value) {
+                        return 'Y' + value;
+                    }
                     }
                 },
                 y: {
