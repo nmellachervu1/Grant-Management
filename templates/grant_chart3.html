@@ -103,7 +103,6 @@
         const months_remaining = "{{ months_remaining }}";
         const grant_liquidated = "{{ grant_liquidated }}";
         const grant_udo = "{{ grant_udo }}";
-        const obligationForecast = {{ forecast_data|tojson }};
 
 
         function createChart(data) {
@@ -127,17 +126,6 @@
                             pointRadius: 5,
                             borderDash: [10, 5], // Dashed line
                             order: 0 // Bring to front
-                        },
-                        {
-                            label: 'Obligation Forecast',
-                            data: obligationForecast.GrantTimeElapsed.map((x, i) => ({ x: x, y: obligationForecast.ObligationSpent[i] })),
-                            backgroundColor: 'rgba(255, 255, 0, 0.5)',
-                            borderColor: 'rgba(255, 255, 0, 1)',
-                            borderWidth: 2,
-                            fill: false,
-                            pointRadius: 5,
-                            borderRadius: [5,0]
-
                         },
                         {
                             label: 'Average Liquidation Rate',
