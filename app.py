@@ -91,6 +91,14 @@ Global_grants= [
     '20NU2HGH000077EBOLCV9390GUA2021', '23NU2GGH0024629390FKR2023', '20NU2HGH000051C69390JFD2022', '20NU2HGH000051C39390GBN2022', '21NU2GGH00237222C39390GAP2022', '21NU2GGH002372PEC69390J6U2022', '22NU2GGH0024019390FKR2023', '20NU2HGH0000519390K202022'
 ]
 
+BAC_grants = ['NU14GH0012382020', 'NU2GGH0013532020', 'NU2GGH0014632019',
+       'NU2GGH0019372020', 'NU2GGH0019372021', 'NU2GGH0019762020',
+       'NU2GGH0019782020', 'NU2GGH0019792020', 'NU2GGH0019802020',
+       'NU2GGH0019992020', 'NU2GGH0020002022', 'NU2GGH0020022022',
+       'NU2GGH0020082020', 'NU2GGH0020102020', 'NU2GGH0020212020',
+       'NU2GGH0020222020', 'NU2GGH0020272020', 'NU2GGH0020462020',
+       'NU2GGH0020592021', 'NU2GGH0020902020']
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -161,9 +169,9 @@ def grant():
 def portfolio_global():
     #data = generate_graph_without_overlay()
     country = "GLOBAL"
-    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(Global_grants)
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(BAC_grants)
     country_area_data, avg_line = generate_country_graph_without_overlay(country)
-    #print(latest_months_data)
+    print("Latest month data", latest_months_data)
     if isinstance(area_data, tuple):
         return area_data[0], area_data[1]
     #return render_template("SA.html", data=data)
@@ -443,19 +451,14 @@ def ai_summary_grant(docs):
 
 def latest_months_in_grants(grants):
     try:
-        # Load Excel files
-        udo_ts = pd.read_excel("GHC FY21-23 Grant UDO Data.xlsx")
-        udo_c = pd.read_excel("GHC Grant Data Test.xlsx", skiprows=3, header=1)
-        
-        # Select relevant columns
-        udo_c_selected = udo_c[["Unique ID", "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date", "Grantee", "Country"]]
-        
-        # Merge dataframes
-        udo_combined = udo_ts.merge(udo_c_selected, how='left', on='Unique ID')
-        udo_combined.sort_values(by=['Unique ID', 'Month'], axis=0, inplace=True, ignore_index=True)
-        
+        import pandas as pd
+
+        # Load the BAC_Data.xlsx file
+        bac_data = pd.read_excel('BAC_Data.xlsx')
+
         # Process data
-        obligation_progression = udo_combined[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable", "Grantee", "Country"]]
+        obligation_progression = bac_data[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Grantee", "Country"]]
+  
         obligation_progression["Month"] = pd.to_datetime(obligation_progression["Month"], infer_datetime_format=True)
         obligation_progression["Grant End Date"] = pd.to_datetime(obligation_progression["Grant End Date"], infer_datetime_format=True)
         obligation_progression["Grant End Date EOM"] = obligation_progression["Grant End Date"] + pd.offsets.MonthEnd(0)
@@ -497,8 +500,8 @@ def latest_months_in_grants(grants):
         # Ensure Obligation Spent is between 0 and 100
         obligation_progression = obligation_progression[(obligation_progression["Obligation Spent"] >= 0) & (obligation_progression["Obligation Spent"] <= 100)]
 
-        udo_progression = obligation_progression[obligation_progression["UDO Status"] == "ULO"]
-        non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non ULO"]
+        udo_progression = obligation_progression[obligation_progression["UDO Status"] == "UDO"]
+        non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non UDO"]
 
         # Train model for UDO
         X = udo_progression[["Grant Time Elapsed"]]
