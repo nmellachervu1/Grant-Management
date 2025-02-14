@@ -103,6 +103,14 @@ BAC_SA_Grants = ['NU2GGH0019372020', 'NU2GGH0019372021', 'NU2GGH0019802020',
        'NU2GGH0021882020', 'NU2GGH0021892020', 'NU2GGH0021902020',
        'NU2GGH0021932020', 'NU2GGH0021942020', 'NU2GGH0021952020']
 
+BAC_grant_tool = ['NU14GH0012382020', 'NU2GGH0013532020', 'NU2GGH0014632019',
+       'NU2GGH0019372020', 'NU2GGH0019372021', 'NU2GGH0019762020',
+       'NU2GGH0019782020', 'NU2GGH0019792020', 'NU2GGH0019802020',
+       'NU2GGH0019992020', 'NU2GGH0020002022', 'NU2GGH0020022022',
+       'NU2GGH0020082020', 'NU2GGH0020102020', 'NU2GGH0020212020',
+       'NU2GGH0020222020', 'NU2GGH0020272020', 'NU2GGH0020462020',
+       'NU2GGH0020592021', 'NU2GGH0020902020']
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -163,11 +171,11 @@ def grant():
 
         print(grant_data)
 
-        forecast_data = run_model(grant_name)
+        #forecast_data = run_model(grant_name)
 
         #print(avg_line)
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country, forecast_data = forecast_data)
-    return render_template("grant_js_form.html", grants=grants)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country)
+    return render_template("grant_js_form.html", grants=BAC_grant_tool)
 
 @app.route("/global_portfolio")
 def portfolio_global():
@@ -586,19 +594,12 @@ def latest_months_in_grants(grants):
 
 def generate_graph_with_grant(grant_name):
     try:
-        # Load Excel files
-        udo_ts = pd.read_excel("GHC FY21-23 Grant UDO Data.xlsx")
-        udo_c = pd.read_excel("GHC Grant Data Test.xlsx", skiprows=3, header=1)
-        
-        # Select relevant columns
-        udo_c_selected = udo_c[["Unique ID", "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date", "Grantee", "Country"]]
-        
-        # Merge dataframes
-        udo_combined = udo_ts.merge(udo_c_selected, how='left', on='Unique ID')
-        udo_combined.sort_values(by=['Unique ID', 'Month'], axis=0, inplace=True, ignore_index=True)
-        
+        # Load the BAC_Data.xlsx file
+        bac_data = pd.read_excel('BAC_Data.xlsx')
+
         # Process data
-        obligation_progression = udo_combined[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable", "Grantee", "Country"]]
+        obligation_progression = bac_data[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Grantee", "Country"]]
+
         obligation_progression["Month"] = pd.to_datetime(obligation_progression["Month"], infer_datetime_format=True)
         obligation_progression["Grant End Date"] = pd.to_datetime(obligation_progression["Grant End Date"], infer_datetime_format=True)
         obligation_progression["Grant End Date EOM"] = obligation_progression["Grant End Date"] + pd.offsets.MonthEnd(0)
@@ -637,8 +638,8 @@ def generate_graph_with_grant(grant_name):
         # Ensure Obligation Spent is between 0 and 100
         obligation_progression = obligation_progression[(obligation_progression["Obligation Spent"] >= 0) & (obligation_progression["Obligation Spent"] <= 100)]
 
-        udo_progression = obligation_progression[obligation_progression["UDO Status"] == "ULO"]
-        non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non ULO"]
+        udo_progression = obligation_progression[obligation_progression["UDO Status"] == "UDO"]
+        non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non UDO"]
 
         # Train model for UDO
         X = udo_progression[["Grant Time Elapsed"]]
