@@ -99,6 +99,10 @@ BAC_grants = ['NU14GH0012382020', 'NU2GGH0013532020', 'NU2GGH0014632019',
        'NU2GGH0020222020', 'NU2GGH0020272020', 'NU2GGH0020462020',
        'NU2GGH0020592021', 'NU2GGH0020902020']
 
+BAC_SA_Grants = ['NU2GGH0019372020', 'NU2GGH0019372021', 'NU2GGH0019802020',
+       'NU2GGH0021882020', 'NU2GGH0021892020', 'NU2GGH0021902020',
+       'NU2GGH0021932020', 'NU2GGH0021942020', 'NU2GGH0021952020']
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -194,7 +198,7 @@ def portfolio_global():
 def portfolio_SA():
     #data = generate_graph_without_overlay()
     country = "SOUTH AFRICA"
-    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(SA_grants)
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(BAC_SA_Grants)
     country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
@@ -799,19 +803,11 @@ def generate_graph_without_overlay():
 
 def generate_country_graph_without_overlay(Country_Name):
     try:
-        udo_ts = pd.read_excel("GHC FY21-23 Grant UDO Data.xlsx")
-        udo_c = pd.read_excel("GHC Grant Data Test.xlsx", skiprows=3, header=1)
-
-        # Select relevant columns
-        udo_c_selected = udo_c[["Unique ID","Country","CAN", "Grantee", "Fund Year", "Fund Description",  "UDO Status", "Recoverable", "Grant Start Date", "Grant End Date"]]
-
-        #udo_c_selected = udo_c_selected[udo_c_selected['Grant End Date'] < "2023-09-30"]
-        # Merge dataframes
-        udo_combined = udo_ts.merge(udo_c_selected, how='left', on='Unique ID')
-        udo_combined.sort_values(by=['Unique ID', 'Month'], axis=0, inplace=True, ignore_index=True)
+        # Load the BAC_Data.xlsx file
+        bac_data = pd.read_excel('BAC_Data.xlsx')
 
         # Process data
-        obligation_progression = udo_combined[["Unique ID", "Country","CAN", "Grantee", "Fund Year", "Fund Description", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Recoverable"]]
+        obligation_progression = bac_data[["Unique ID", "Month", "Obligation", "Disbursement", "Undisbursed Amount", "Grant Start Date", "Grant End Date", "UDO Status", "Grantee", "Country"]]
 
         obligation_progression["Month"] = pd.to_datetime(obligation_progression["Month"], infer_datetime_format=True)
         obligation_progression["Grant End Date"] = pd.to_datetime(obligation_progression["Grant End Date"], infer_datetime_format=True)
@@ -867,8 +863,8 @@ def generate_country_graph_without_overlay(Country_Name):
 
         obligation_progression = filtered_obligation_progression
 
-        udo_progression = obligation_progression[obligation_progression["UDO Status"] == "ULO"]
-        non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non ULO"]
+        udo_progression = obligation_progression[obligation_progression["UDO Status"] == "UDO"]
+        non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non UDO"]
 
         # Calculate the average line of obligation spent against time elapsed
         avg_obligation_spent = obligation_progression.groupby("Grant Time Elapsed")["Obligation Spent"].mean().reset_index()
