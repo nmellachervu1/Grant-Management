@@ -48,6 +48,7 @@ from darts.models import (
     BlockRNNModel,
     NBEATSModel,
     RNNModel,
+    XGBModel
 )
 
 from darts.utils.callbacks import TFMProgressBar
@@ -177,10 +178,10 @@ def grant():
 
         print(grant_data)
 
-        #forecast_data = run_model(grant_name)
+        forecast_data = run_regression_model(grant_name, grant_obligation, grant_months_remaining)
 
         #print(avg_line)
-        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country)
+        return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country, forecast_data = forecast_data)
     return render_template("grant_js_form.html", grants=BAC_grant_tool)
 
 @app.route("/global_portfolio")
@@ -413,6 +414,65 @@ def scale_preds(pred, grant_to_forecast, target_time_series):
 
     return pred_df
 
+def run_regression_model(grant_to_forecast, grant_obligation, grant_months_remaining):
+    import joblib
+
+    # Load the scaled_grant_series dictionary from the file
+    series_dict_diff = joblib.load('series_dict_diff.pkl')
+    scalers_dict_diff = joblib.load('scalers_dict_diff.pkl')
+
+    model = XGBModel(
+        lags=6, output_chunk_length=1, likelihood="quantile", quantiles=[0.05, 0.5, 0.95]
+    )
+
+    model.fit(series_dict_diff[grant_to_forecast])
+
+    pred_samples = model.predict(series = series_dict_diff[grant_to_forecast],n=24, num_samples=500)
+
+    #Unscale the results
+    back_diff = scalers_dict_diff[grant_to_forecast].inverse_transform(series_dict_diff[grant_to_forecast])
+
+    back_pred_samples = scalers_dict_diff[grant_to_forecast].inverse_transform(pred_samples)
+
+    #Convert back_diff to cumsum
+    back_diff = back_diff.cumsum()
+
+    #Covert all the columns of back_pred_samples to cumsum
+    back_pred_samples = back_pred_samples.cumsum() + back_diff[-1]
+
+    #Conmver y-axis to index values
+    back_pred_samples = back_pred_samples.pd_dataframe().reset_index(drop=True)
+
+    #Conmver y-axis to index values
+    back_diff = back_diff.pd_dataframe().reset_index(drop=True)
+
+    #Divide x-axis by 60 to get percent
+    back_diff.index = back_diff.index / 60 * 100
+    
+    # Divide x-axis by 60 to get percent
+    back_pred_samples.index = back_pred_samples.index / 60 * 100
+
+    #Divide y-axis by grant_obligation
+    back_pred_samples = back_pred_samples['Disbursement_s0'] / grant_obligation * 100
+
+    #Print back_pred_samples
+    print(back_pred_samples)
+
+    #grant time elapsed
+    time_elapsed = ((61 - grant_months_remaining) / 60 ) * 100
+
+    #Increase back_pred_samples x-axis by time_elapsed
+    back_pred_samples.index = back_pred_samples.index + time_elapsed
+
+
+    forecast_data = {
+        'GrantTimeElapsed': back_pred_samples.index.tolist(),
+        'ObligationSpent': back_pred_samples.tolist(),
+    }
+
+    #print(forecast_data)
+
+    return forecast_data
 
 
 
