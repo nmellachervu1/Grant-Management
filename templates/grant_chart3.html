@@ -105,12 +105,28 @@
         const grant_udo = "{{ grant_udo }}";
         const obligationForecast = {{ forecast_data|tojson }};
 
+        // Adjust overlayData x-axis values
+        overlayData.GrantTimeElapsed = overlayData.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
+
+        // Adjust data_country x-axis values
+        data_country.GrantTimeElapsed = data_country.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
+
+        // Adjust avgObligationSpent x-axis values
+        avgObligationSpent.GrantTimeElapsed = avgObligationSpent.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
+
+        // Adjust forecast data x-axis values
+        obligationForecast.GrantTimeElapsed = obligationForecast.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
+
+
+
 
         function createChart(data) {
             const ctx = document.getElementById('myChart').getContext('2d');
 
             const lastX = overlayData.GrantTimeElapsed[overlayData.GrantTimeElapsed.length - 1];
             const lastY = overlayData.ObligationSpent[overlayData.ObligationSpent.length - 1];
+            
+            data.GrantTimeElapsed = data.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
 
             const myChart = new Chart(ctx, {
                 type: 'line',
@@ -173,7 +189,7 @@
                             type: 'linear',
                             title: {
                                 display: true,
-                                text: 'X-Axis: % of Grant Time Elapsed',
+                                text: 'X-Axis: Year',
                                 font: {
                                     size: 20
                                 }
@@ -181,10 +197,15 @@
                             ticks: {
                                 font: {
                                     size: 20
-                                }
-                            },
+                                },
+                            
                             min: 0,
-                            max: 100
+                            max: 5,
+                            stepSize: 1,
+                            callback: function(value) {
+                                return 'Y' + value;
+                            }
+                        }
                         },
                         y: {
                             title: {
