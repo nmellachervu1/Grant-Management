@@ -92,13 +92,7 @@ Global_grants= [
     '20NU2HGH000077EBOLCV9390GUA2021', '23NU2GGH0024629390FKR2023', '20NU2HGH000051C69390JFD2022', '20NU2HGH000051C39390GBN2022', '21NU2GGH00237222C39390GAP2022', '21NU2GGH002372PEC69390J6U2022', '22NU2GGH0024019390FKR2023', '20NU2HGH0000519390K202022'
 ]
 
-BAC_grants = ['NU14GH0012382020', 'NU2GGH0013532020', 'NU2GGH0014632019',
-       'NU2GGH0019372020', 'NU2GGH0019372021', 'NU2GGH0019762020',
-       'NU2GGH0019782020', 'NU2GGH0019792020', 'NU2GGH0019802020',
-       'NU2GGH0019992020', 'NU2GGH0020002022', 'NU2GGH0020022022',
-       'NU2GGH0020082020', 'NU2GGH0020102020', 'NU2GGH0020212020',
-       'NU2GGH0020222020', 'NU2GGH0020272020', 'NU2GGH0020462020',
-       'NU2GGH0020592021', 'NU2GGH0020902020']
+BAC_grants = ['NU2GGH0024062022', 'NU2HGH0000982021', 'NU2HGH0000042021', 'U01GH0022482020','NU14GH0012382020', 'NU50CK0004942020', 'NU2GGH0024062022', 'NU2GGH0022152020', 'NU38OT0002822020', 'NU51IP0009422022', 'U01GH0023382021', 'NU2GGH0022132020', 'NU2HGH0000502020', 'NU2HGH0000142020', 'NU2GGH0021942020', 'NU2GGH0021712021', 'NU2GGH0023562021', 'NU2HGH0000742020']
 
 BAC_SA_Grants = ['NU2GGH0021892020',
  'NU2GGH0021952020',
@@ -109,6 +103,8 @@ BAC_SA_Grants = ['NU2GGH0021892020',
  'NU2GGH0021882020',
  'NU2GGH0019372021',
  'NU2GGH0019802020']
+
+BAC_US_Grants = ['NU14GH0012382020', 'NU2GGH0024062022', 'NU2HGH0000982021', 'NU51IP0009422022', 'NU2HGH0001002021', 'NU2HGH0000052021', 'NU2GGH0023212021', 'NU50CK0005472021', 'NU14GH0012382020', 'NU50CK0004942020']
 
 BAC_grant_tool = ['NU14GH0012382020', 'NU2GGH0013532020', 'NU2GGH0014632019',
        'NU2GGH0019372020', 'NU2GGH0019372021', 'NU2GGH0019762020',
@@ -228,6 +224,26 @@ def portfolio_SA():
     remaining_obligations = total_obligations - total_liquidated
 
     return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
+
+@app.route("/US")
+def portfolio_US():
+    #data = generate_graph_without_overlay()
+    country = "UNITED STATES"
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(BAC_US_Grants)
+    country_area_data, avg_line = generate_country_graph_without_overlay(country)
+    #print(latest_months_data)
+    if isinstance(area_data, tuple):
+        return area_data[0], area_data[1]
+    #return render_template("SA.html", data=data)
+    # Render the template with the generated data
+
+    # Formatting
+    #total_obligations = "${:,.0f}".format(total_obligations)
+    #total_liquidated = "${:,.0f}".format(total_liquidated)
+
+    remaining_obligations = total_obligations - total_liquidated
+
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "United States", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
 @app.route("/India")
 def portfolio_India():
