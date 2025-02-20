@@ -949,8 +949,13 @@ def generate_country_graph_without_overlay(Country_Name):
         udo_progression = obligation_progression[obligation_progression["UDO Status"] == "UDO"]
         non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non UDO"]
 
+        obligation_progression_avg = obligation_progression
+
+        #round obligation_progression Grant Time Elapsed to whole number
+        obligation_progression_avg['Grant Time Elapsed'] = obligation_progression_avg['Grant Time Elapsed'].round(0)
+
         # Calculate the average line of obligation spent against time elapsed
-        avg_obligation_spent = obligation_progression.groupby("Grant Time Elapsed")["Obligation Spent"].mean().reset_index()
+        avg_obligation_spent = obligation_progression_avg.groupby("Grant Time Elapsed")["Obligation Spent"].mean().reset_index()
 
         avg_obligation_spent_list = {
             'GrantTimeElapsed': avg_obligation_spent['Grant Time Elapsed'].tolist(),
@@ -959,7 +964,7 @@ def generate_country_graph_without_overlay(Country_Name):
 
         # Apply rolling window to smooth the data
         if Country_Name == 'GLOBAL':
-            window = 35
+            window = 20
         else:
             window = 20
         
