@@ -225,6 +225,41 @@ def portfolio_SA():
 
     return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
+BAC_UGANDA_Grants = ['NU2GGH0013532020',
+ 'NU2GGH0020022022',
+ 'NU2GGH0020222020',
+ 'NU2GGH0020462020',
+ 'NU2GGH0021402020',
+ 'NU2GGH0023092020',
+ 'NU2GGH0023562021',
+ 'NU2GGH0023582023',
+ 'NU2HGH0000342020',
+ 'NU2HGH0000452020',
+ 'NU2HGH0000462020',
+ 'NU66GH0021722020',
+ 'U01GH0022482020']
+
+@app.route("/Uganda")
+def portfolio_Uganda():
+    #data = generate_graph_without_overlay()
+    country = "UGANDA"
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(BAC_UGANDA_Grants)
+    country_area_data, avg_line = generate_country_graph_without_overlay(country)
+    #print(latest_months_data)
+    if isinstance(area_data, tuple):
+        return area_data[0], area_data[1]
+    #return render_template("SA.html", data=data)
+    # Render the template with the generated data
+
+    # Formatting
+    #total_obligations = "${:,.0f}".format(total_obligations)
+    #total_liquidated = "${:,.0f}".format(total_liquidated)
+
+    remaining_obligations = total_obligations - total_liquidated
+
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Uganda", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
+
+
 @app.route("/US")
 def portfolio_US():
     #data = generate_graph_without_overlay()
