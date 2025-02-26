@@ -11,6 +11,7 @@ import datetime as dt
 import matplotlib.pyplot as plt
 import io
 import base64
+import math
 
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -981,29 +982,38 @@ def generate_country_graph_without_overlay(Country_Name):
 
         obligation_progression = filtered_obligation_progression
 
+        #Change Grant Lenght Months to 60
+        obligation_progression["Grant Length Months"] = 60
+
+        # Ensure that the 'Grant Months Elapsed' does not exceed 60 months
+        obligation_progression["Grant Months Elapsed"] = obligation_progression["Grant Months Elapsed"].apply(lambda x: 60 if x > 60 else x)
+
         udo_progression = obligation_progression[obligation_progression["UDO Status"] == "UDO"]
         non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non UDO"]
 
-        obligation_progression_avg = obligation_progression
+        ### Calculate the mean Obligation for each Month Elapsed and then convert to percent
+        obligation_progression_avg = obligation_progression.groupby("Grant Months Elapsed")["Obligation Spent"].mean().reset_index()
 
-        #round obligation_progression Grant Time Elapsed to whole number
-        obligation_progression_avg['Grant Time Elapsed'] = obligation_progression_avg['Grant Time Elapsed'].round(0)
+        #Convert Grant Months Elapsed to percent by dividing by 60 and multiplying by 100
+        obligation_progression_avg["Grant Months Elapsed"] = obligation_progression_avg["Grant Months Elapsed"] / 60 * 100
 
-        # Calculate the average line of obligation spent against time elapsed
-        avg_obligation_spent = obligation_progression_avg.groupby("Grant Time Elapsed")["Obligation Spent"].mean().reset_index()
+        obligation_progression_avg = obligation_progression_avg.fillna(0)
 
         avg_obligation_spent_list = {
-            'GrantTimeElapsed': avg_obligation_spent['Grant Time Elapsed'].tolist(),
-            'ObligationSpent': avg_obligation_spent['Obligation Spent'].tolist()
+            'GrantTimeElapsed': obligation_progression_avg['Grant Months Elapsed'].tolist(),
+            'ObligationSpent': obligation_progression_avg['Obligation Spent'].tolist()
         }
 
         # Apply rolling window to smooth the data
         if Country_Name == 'GLOBAL':
-            window = 20
+            window = 12
         else:
-            window = 20
+            window = 10
         
         avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=window).mean().tolist()
+
+        #Replace missing ObligationSpent values with 0
+        avg_obligation_spent_list['ObligationSpent'] = [0 if math.isnan(x) else x for x in avg_obligation_spent_list['ObligationSpent']]
 
         # Train model for UDO
         X = udo_progression[["Grant Time Elapsed"]]
