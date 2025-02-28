@@ -93,7 +93,7 @@ Global_grants= [
     '20NU2HGH000077EBOLCV9390GUA2021', '23NU2GGH0024629390FKR2023', '20NU2HGH000051C69390JFD2022', '20NU2HGH000051C39390GBN2022', '21NU2GGH00237222C39390GAP2022', '21NU2GGH002372PEC69390J6U2022', '22NU2GGH0024019390FKR2023', '20NU2HGH0000519390K202022'
 ]
 
-BAC_grants = ['NU2GGH0024062022', 'NU2HGH0000982021', 'NU2HGH0000042021', 'U01GH0022482020','NU14GH0012382020', 'NU50CK0004942020', 'NU2GGH0024062022', 'NU2GGH0022152020', 'NU38OT0002822020', 'NU51IP0009422022', 'U01GH0023382021','NU2HGH0000502020', 'NU2GGH0021942020', 'NU2GGH0021712021', 'NU2HGH0000742020', 'NU2GGH0024052023', 'NU2GGH0024272023', 'NU2GGH0023582023', 'NU2GGH0023782023', 'NU2GGH0022982023', 'NU2HGH0000812021']
+BAC_grants = ['NU2GGH0024062022', 'NU2HGH0000982021', 'NU2HGH0000042021', 'U01GH0022482020','NU14GH0012382020', 'NU50CK0004942020', 'NU2GGH0024062022', 'NU2GGH0022152020', 'NU38OT0002822020', 'NU51IP0009422022', 'U01GH0023382021', 'NU2GGH0021942020', 'NU2GGH0021712021', 'NU2HGH0000742020', 'NU2GGH0024052023', 'NU2GGH0024272023', 'NU2GGH0023582023', 'NU2GGH0023782023', 'NU2GGH0022982023', 'NU2HGH0000812021']
 
 BAC_SA_Grants = ['NU2GGH0021892020',
  'NU2GGH0021952020',
@@ -202,9 +202,12 @@ def portfolio_global():
     #latest_months_data_df.to_excel("latest_months_data.xlsx")
     #print(area_data)
 
+    #get the lenght of BAC_grants
+    total_grants = len(BAC_grants)
+
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Global", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Global", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants, total_grants = total_grants)
 
 @app.route("/SA")
 def portfolio_SA():
@@ -256,9 +259,12 @@ def portfolio_Uganda():
     #total_obligations = "${:,.0f}".format(total_obligations)
     #total_liquidated = "${:,.0f}".format(total_liquidated)
 
+    total_grants = len(BAC_UGANDA_Grants)
+
+
     remaining_obligations = total_obligations - total_liquidated
 
-    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Uganda", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
+    return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "Uganda", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants, total_grants = total_grants)
 
 
 @app.route("/US")

@@ -177,6 +177,7 @@
         const latestMonthsData = {{ latest_months_data|tojson }};
         const data_country = {{ country_area_data|tojson }};
         const avgObligationSpent = {{ avg_line|tojson }};
+        const total_grants = {{ total_grants }};
 
         const country = "{{ country }}";
         if (country === "Global"){
@@ -269,134 +270,117 @@
         function calculatePointsAboveBelow_global(filteredDatasets) {
             let pointsAbove_global = 0;
             let pointsBelow_global = 0;
-            let totalGrants_global = 0;
+            let totalGrants_global = total_grants;
 
             if(!filteredDatasets || filteredDatasets.length === 0){
-                document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
-                document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
-                document.getElementById('totalGrants_global').textContent = totalGrants_global;
-                return;
+            document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
+            document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
+            document.getElementById('totalGrants_global').textContent = totalGrants_global;
+            return;
             }
-    
+        
             filteredDatasets.forEach((dataset, i) => {
-                const xValue = dataset.data[0].x;
-                const yValue = dataset.data[0].y;
-                // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
-                
-                let x1, y1, x2, y2;
-                 
-                for (let index = 0; index < data_global.GrantTimeElapsed.length - 1; index++) {
-                    if (data_global.GrantTimeElapsed[index] <= xValue && data_global.GrantTimeElapsed[index + 1] >= xValue) {
-                        x1 = data_global.GrantTimeElapsed[index];
-                        y1 = data_global.UDOPredictedLevel[index];
-                        x2 = data_global.GrantTimeElapsed[index + 1];
-                        y2 = data_global.UDOPredictedLevel[index + 1];
-                        break;
-                    }
+            const xValue = dataset.data[0].x;
+            const yValue = dataset.data[0].y;
+            // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
+            
+            let x1, y1, x2, y2;
+             
+            for (let index = 0; index < data_global.GrantTimeElapsed.length - 1; index++) {
+                if (data_global.GrantTimeElapsed[index] * 60 / 12 * 0.01 <= xValue && data_global.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01 >= xValue) {
+                x1 = data_global.GrantTimeElapsed[index] * 60 / 12 * 0.01;
+                y1 = data_global.UDOPredictedLevel[index];
+                x2 = data_global.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01;
+                y2 = data_global.UDOPredictedLevel[index + 1];
+                break;
                 }
-                 
-                // Perform linear interpolation to find predicted y-value for the given xValue
-                let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
-                 
-                // Compare yValue with the interpolated predictedYValue
-                if (yValue > predictedYValue) {
-                    pointsAbove_global++;
-                } else if (yValue < predictedYValue) {
-                    pointsBelow_global++;
-                }
+            }
+             
+            // Perform linear interpolation to find predicted y-value for the given xValue
+            let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
+             
+            // Compare yValue with the interpolated predictedYValue
+            if (yValue < predictedYValue) {
+                pointsBelow_global++;
+            }
             });
 
-            totalGrants_global = pointsAbove_global + pointsBelow_global;
+            pointsAbove_global = totalGrants_global - pointsBelow_global;
 
-            pointsAboveElement_global = document.getElementById('pointsAbove_global');
-            pointsBelowElement_global = document.getElementById('pointsBelow_global');
-            totalGrantsElement_global = document.getElementById('totalGrants_global');
+            const pointsAboveElement_global = document.getElementById('pointsAbove_global');
+            const pointsBelowElement_global = document.getElementById('pointsBelow_global');
+            const totalGrantsElement_global = document.getElementById('totalGrants_global');
 
             if(pointsAboveElement_global) {
-                pointsAboveElement_global.textContent = pointsAbove_global
+            pointsAboveElement_global.textContent = pointsAbove_global;
             }
 
             if(pointsBelowElement_global) {
-                pointsBelowElement_global.textContent = pointsBelow_global
+            pointsBelowElement_global.textContent = pointsBelow_global;
             }
 
             if(totalGrantsElement_global){
-                totalGrantsElement_global.textContent = totalGrants_global
+            totalGrantsElement_global.textContent = totalGrants_global;
             }
-
-
-            // Update the div content with the calculated values
-            //document.getElementById('pointsAbove_global').textContent = pointsAbove_global;
-            //document.getElementById('pointsBelow_global').textContent = pointsBelow_global;
-    
-            //console.log(`(Global) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_global}`);
-            //console.log(`(Global) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_global}`);
         }
 
+        
+        
         function calculatePointsAboveBelow_country(filteredDatasets) {
             let pointsAbove_country = 0;
             let pointsBelow_country = 0;
-            let totalGrants_country = 0;
+            let totalGrants_country = filteredDatasets ? filteredDatasets.length : 0;
 
             if(!filteredDatasets || filteredDatasets.length === 0){
                 document.getElementById('pointsAbove_country').textContent = pointsAbove_country;
                 document.getElementById('pointsBelow_country').textContent = pointsBelow_country;
                 document.getElementById('totalGrants_country').textContent = totalGrants_country;
                 return;
-            }
+                }
     
-            filteredDatasets.forEach((dataset, i) => {
-                const xValue = dataset.data[0].x;
-                const yValue = dataset.data[0].y;
-                // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
-                
-                let x1, y1, x2, y2;
-                 
-                for (let index = 0; index < data_country.GrantTimeElapsed.length - 1; index++) {
-                    if (data_country.GrantTimeElapsed[index] <= xValue && data_country.GrantTimeElapsed[index + 1] >= xValue) {
-                        x1 = data_country.GrantTimeElapsed[index];
+                filteredDatasets.forEach((dataset, i) => {
+                    const xValue = dataset.data[0].x;
+                    const yValue = dataset.data[0].y;
+                    // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
+                    
+                    let x1, y1, x2, y2;
+                     
+                    for (let index = 0; index < data_country.GrantTimeElapsed.length - 1; index++) {
+                        if (data_country.GrantTimeElapsed[index] * 60 / 12 * 0.01 <= xValue && data_country.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01 >= xValue) {
+                        x1 = data_country.GrantTimeElapsed[index] * 60 / 12 * 0.01;
                         y1 = data_country.UDOPredictedLevel[index];
-                        x2 = data_country.GrantTimeElapsed[index + 1];
+                        x2 = data_country.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01;
                         y2 = data_country.UDOPredictedLevel[index + 1];
                         break;
+                        }
                     }
-                }
-                 
-                // Perform linear interpolation to find predicted y-value for the given xValue
-                let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
-                 
-                // Compare yValue with the interpolated predictedYValue
-                if (yValue > predictedYValue) {
-                    pointsAbove_country++;
-                } else if (yValue < predictedYValue) {
-                    pointsBelow_country++;
-                }
-            });
-
-            totalGrants_country = pointsAbove_country + pointsBelow_country;
-
-            const pointsAboveElement_country = document.getElementById('pointsAbove_country');
-            const pointsBelowElement_country = document.getElementById('pointsBelow_country');
-            const totalGrantsElement_country = document.getElementById('totalGrants_country');
-
-            // Update the div content with the calculated values
-            if(pointsAboveElement_country){
-                pointsAboveElement_country.textContent = pointsAbove_country;
-            }
-
-            if(pointsBelowElement_country){
-                pointsBelowElement_country.textContent = pointsBelow_country;
-            }
-
-            if(totalGrantsElement_country){
-                totalGrantsElement_country.textContent = totalGrants_country;
-            }
-
-            //document.getElementById('pointsAbove_country').textContent = pointsAbove_country;
-            //document.getElementById('pointsBelow_country').textContent = pointsBelow_country;
-    
-            //console.log(`(Country) Points above the "Less Than 100% Liquidation Pattern": ${pointsAbove_country}`);
-            //console.log(`(Country) Points below the "Less Than 100% Liquidation Pattern": ${pointsBelow_country}`);
+                     
+                    // Perform linear interpolation to find predicted y-value for the given xValue
+                    let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
+                     
+                    // Compare yValue with the interpolated predictedYValue
+                    if (yValue < predictedYValue) {
+                        pointsBelow_country++;
+                    }
+                    });
+        
+                    pointsAbove_countr = totalGrants_country - pointsBelow_country;
+        
+                    const pointsAboveElement_country = document.getElementById('pointsAbove_country');
+                    const pointsBelowElement_country = document.getElementById('pointsBelow_country');
+                    const totalGrantsElement_country = document.getElementById('totalGrants_country');
+        
+                    if(pointsAboveElement_country) {
+                    pointsAboveElement_country.textContent = pointsAbove_country;
+                    }
+        
+                    if(pointsBelowElement_country) {
+                    pointsBelowElement_country.textContent = pointsBelow_country;
+                    }
+        
+                    if(totalGrantsElement_country){
+                    totalGrantsElement_country.textContent = totalGrants_country;
+                    }
         }
 
         // Call the function to calculate points above and below
