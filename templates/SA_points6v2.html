@@ -84,7 +84,7 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text", id="genai-summary">
-                        LLM Reponse is Being Generated...
+                        Please Select a Disbursement Pattern to Generate Summary
                     </p>
                 </div>
             </div>
@@ -186,6 +186,7 @@
             if (dataSelectorDiv) {
                 dataSelectorDiv.style.display = 'none';
             }
+            document.getElementById('genai-summary').textContent = "LLM Response is Being Generated";
         }
         
         // Function to generate unique colors
@@ -337,51 +338,51 @@
                 document.getElementById('pointsBelow_country').textContent = pointsBelow_country;
                 document.getElementById('totalGrants_country').textContent = totalGrants_country;
                 return;
+            }
+
+            filteredDatasets.forEach((dataset, i) => {
+                const xValue = dataset.data[0].x;
+                const yValue = dataset.data[0].y;
+                // Find the two closest x-values in data_country.GrantTimeElapsed to perform interpolation
+                
+                let x1, y1, x2, y2;
+                 
+                for (let index = 0; index < data_country.GrantTimeElapsed.length - 1; index++) {
+                    if (data_country.GrantTimeElapsed[index] * 60 / 12 * 0.01 <= xValue && data_country.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01 >= xValue) {
+                    x1 = data_country.GrantTimeElapsed[index] * 60 / 12 * 0.01;
+                    y1 = data_country.UDOPredictedLevel[index];
+                    x2 = data_country.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01;
+                    y2 = data_country.UDOPredictedLevel[index + 1];
+                    break;
+                    }
                 }
-    
-                filteredDatasets.forEach((dataset, i) => {
-                    const xValue = dataset.data[0].x;
-                    const yValue = dataset.data[0].y;
-                    // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
-                    
-                    let x1, y1, x2, y2;
-                     
-                    for (let index = 0; index < data_country.GrantTimeElapsed.length - 1; index++) {
-                        if (data_country.GrantTimeElapsed[index] * 60 / 12 * 0.01 <= xValue && data_country.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01 >= xValue) {
-                        x1 = data_country.GrantTimeElapsed[index] * 60 / 12 * 0.01;
-                        y1 = data_country.UDOPredictedLevel[index];
-                        x2 = data_country.GrantTimeElapsed[index + 1] * 60 / 12 * 0.01;
-                        y2 = data_country.UDOPredictedLevel[index + 1];
-                        break;
-                        }
-                    }
-                     
-                    // Perform linear interpolation to find predicted y-value for the given xValue
-                    let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
-                     
-                    // Compare yValue with the interpolated predictedYValue
-                    if (yValue < predictedYValue) {
-                        pointsBelow_country++;
-                    }
-                    });
-        
-                    pointsAbove_countr = totalGrants_country - pointsBelow_country;
-        
-                    const pointsAboveElement_country = document.getElementById('pointsAbove_country');
-                    const pointsBelowElement_country = document.getElementById('pointsBelow_country');
-                    const totalGrantsElement_country = document.getElementById('totalGrants_country');
-        
-                    if(pointsAboveElement_country) {
-                    pointsAboveElement_country.textContent = pointsAbove_country;
-                    }
-        
-                    if(pointsBelowElement_country) {
-                    pointsBelowElement_country.textContent = pointsBelow_country;
-                    }
-        
-                    if(totalGrantsElement_country){
-                    totalGrantsElement_country.textContent = totalGrants_country;
-                    }
+                 
+                // Perform linear interpolation to find predicted y-value for the given xValue
+                let predictedYValue = y1 + (y2 - y1) * ((xValue - x1) / (x2 - x1));
+                 
+                // Compare yValue with the interpolated predictedYValue
+                if (yValue < predictedYValue) {
+                    pointsBelow_country++;
+                }
+            });
+
+            pointsAbove_country = totalGrants_country - pointsBelow_country;
+
+            const pointsAboveElement_country = document.getElementById('pointsAbove_country');
+            const pointsBelowElement_country = document.getElementById('pointsBelow_country');
+            const totalGrantsElement_country = document.getElementById('totalGrants_country');
+
+            if(pointsAboveElement_country) {
+                pointsAboveElement_country.textContent = pointsAbove_country;
+            }
+
+            if(pointsBelowElement_country) {
+                pointsBelowElement_country.textContent = pointsBelow_country;
+            }
+
+            if(totalGrantsElement_country){
+                totalGrantsElement_country.textContent = totalGrants_country;
+            }
         }
 
         // Call the function to calculate points above and below
@@ -447,8 +448,11 @@
         }
 
         function updateSummary(isGlobal, filteredScatterDatasets) {
-            //const selectedData = isGlobal ? data_global : data_country;
             const promptData = generatePromptFromGraph(isGlobal, filteredScatterDatasets);
+            const summaryElement = document.getElementById('genai-summary');
+            if (summaryElement) {
+                summaryElement.textContent = "LLM Response is Being Generated";
+            }
             fetchAndDisplaySummary(promptData);
         }
 
@@ -596,22 +600,26 @@
             // Create a new chart with the selected data or only filtered scatter datasets if no option is selected
             if (value === '') {
                 currentChart = createChart({ GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
+                if (country !== "Global") {
+                    document.getElementById('genai-summary').textContent = "Please Select a Disbursement Pattern to Generate Summary";
+                }
+                resetPoints();
             } else {
                 currentChart = createChart(selectedData, filteredScatterDatasets);
+                if(isGlobal) {
+                    calculatePointsAboveBelow_global(filteredScatterDatasets);
+                } else {
+                    calculatePointsAboveBelow_country(filteredScatterDatasets);
+                }
+                updateSummary(isGlobal, filteredScatterDatasets);
             }
-
-            if(isGlobal) {
-                calculatePointsAboveBelow_global(filteredScatterDatasets);
-            } else {
-                calculatePointsAboveBelow_country(filteredScatterDatasets);
-            }
-
-            updateSummary(isGlobal, filteredScatterDatasets);
         });
 
         //initially show global data
         updatePoints(true);
-        updateSummary(true, filteredScatterDatasets);
+        if (country === "Global") {
+            updateSummary(true, filteredScatterDatasets);
+        }
 
         document.getElementById('timeSelector').addEventListener('change', function(event) {
             const timeFrame = event.target.value;
@@ -639,7 +647,10 @@
                 calculatePointsAboveBelow_country(filteredScatterDatasets);
             }
 
-            updateSummary(isGlobal, filteredScatterDatasets);
+            // Only call updateSummary if a valid disbursement pattern is selected
+            if (value !== '') {
+                updateSummary(isGlobal, filteredScatterDatasets);
+            }
         });
     });
 </script>
