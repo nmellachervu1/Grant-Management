@@ -2,10 +2,10 @@
 
 {% block body %}
 <div class="container-md mt-4">
-    <label for="dataSelector" style= "font-weight: bold;">Select UDO Area Source:</label>
+    <label for="dataSelector" style= "font-weight: bold;">Select Disbursement Pattern:</label>
     <select id="dataSelector">
-        <option value="data_global">Overall Data</option>
-        <option value="data_country">Country-Specific Data</option>
+        <option value="data_global">Portfolio Level</option>
+        <option value="data_country">Country Level</option>
     </select>
 </div>
 
@@ -23,7 +23,7 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text", id="genai-summary">
-                        The graph displays the latest data on grant spending against time elapsed. It highlights three grants within the red shaded area, indicating they require intervention. Of these, one grant has less than 50% time elapsed, suggesting that reminders and follow-ups should be conducted. The other two grants have more than 50% time elapsed, necessitating actions like pulling back funds or amending future obligations. Additionally, while 10 grants are performing above the average liquidation rate, 11 grants, including those needing intervention, fall below this average. This suggests a broader review and monitoring may be necessary to ensure optimized spending and fulfill grant obligations promptly.
+                        LLM Reponse is Being Generated...
                     </p>
                 </div>
             </div>
@@ -105,6 +105,9 @@
         const grant_udo = "{{ grant_udo }}";
         const obligationForecast = {{ forecast_data|tojson }};
 
+        //log the data_country to the console
+        // console.log(data_country);
+
         // Adjust overlayData x-axis values
         overlayData.GrantTimeElapsed = overlayData.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
 
@@ -117,6 +120,8 @@
         // Adjust forecast data x-axis values
         obligationForecast.GrantTimeElapsed = obligationForecast.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
 
+        //Adjust data_glovbal x-axis values
+        data_global.GrantTimeElapsed = data_global.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
 
 
 
@@ -126,7 +131,7 @@
             const lastX = overlayData.GrantTimeElapsed[overlayData.GrantTimeElapsed.length - 1];
             const lastY = overlayData.ObligationSpent[overlayData.ObligationSpent.length - 1];
             
-            data.GrantTimeElapsed = data.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
+            //data.GrantTimeElapsed = data.GrantTimeElapsed.map(x => x * 60 / 12 * 0.01);
 
             const myChart = new Chart(ctx, {
                 type: 'line',
@@ -134,7 +139,7 @@
                     labels: data.GrantTimeElapsed,
                     datasets: [
                         {
-                            label: 'Grant Trend Line',
+                            label: 'Actual Drawdown',
                             data: overlayData.GrantTimeElapsed.map((x, i) => ({ x: x, y: overlayData.ObligationSpent[i] })),
                             backgroundColor: 'rgba(0, 0, 0, 0.5)',
                             borderColor: 'rgba(0, 0, 0, 1)',
@@ -145,7 +150,7 @@
                             order: 0 // Bring to front
                         },
                         {
-                            label: 'Obligation Forecast',
+                            label: 'Forecasted Drawdown',
                             data: obligationForecast.GrantTimeElapsed.map((x, i) => ({ x: x, y: obligationForecast.ObligationSpent[i] })),
                             backgroundColor: 'rgba(255, 255, 0, 0.5)',
                             borderColor: 'rgba(255, 255, 0, 1)',
@@ -156,10 +161,10 @@
 
                         },
                         {
-                            label: 'Average Liquidation Rate',
+                            label: 'Historical Average Drawdown',
                             data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x, y: avgObligationSpent.ObligationSpent[i] })),
-                            backgroundColor: 'rgba(255, 0, 0, 0.5)',
-                            borderColor: 'rgba(255, 0, 0, 1)',
+                            backgroundColor: 'rgba(0, 0, 255, 0.5)',
+                            borderColor: 'rgba(0, 0, 255, 1)',
                             borderWidth: 2,
                             fill: false,
                             pointRadius: 0,
@@ -181,7 +186,7 @@
                             type: 'linear',
                             title: {
                                 display: true,
-                                text: 'X-Axis: Year',
+                                text: 'Liquidation Year',
                                 font: {
                                     size: 20
                                 }
@@ -249,6 +254,8 @@
 
         // Initial chart creation with global data
         let currentChart = createChart(data_global);
+        //Call the updateSummary function to display the summary
+        updateSummary(true, overlayData, data_global);
 
         // Event listener for data selector
         document.getElementById('dataSelector').addEventListener('change', function(event) {
@@ -259,6 +266,10 @@
             if(currentChart){
                 currentChart.destroy();
             }
+
+            //console log the selected data, add "Selected Data" to the console log
+            console.log(selectedData);
+            console.log("Selected Data");
             
             // Create a new chart with the selected data
             currentChart = createChart(selectedData);
