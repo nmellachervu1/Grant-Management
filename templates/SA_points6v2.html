@@ -44,10 +44,11 @@
 </style>
 
 <div class="container-md mt-4" id="dataSelectorDiv">
-    <label for="dataSelector" style= "font-weight: bold;">Select UDO Area Source:</label>
+    <label for="dataSelector" style= "font-weight: bold;">Disbursement Pattern:</label>
     <select id="dataSelector">
-        <option value="data_global">Overall Data</option>
-        <option value="data_country">Country-Specific Data</option>
+        <option value="">Select an option</option>
+        <option value="data_global">Portfolio Level</option>
+        <option value="data_country">Country Level</option>
     </select>
 </div>
 
@@ -64,7 +65,7 @@
 </div>
 
 <div class="container-md mt-4">
-    <h5>{{ country }} Portfolio of Grants' Latest Month against Disbursement Patterns</h5>
+    <h5>{{ country }} Portfolio Liquidations Progress vs. Disbursement Patterns</h5>
         <div class="d-flex">
             <!-- Chart Section -->
                 <div class="flex-grow-1">
@@ -153,7 +154,7 @@
         </div>
         <div class="card mt-4">
             <div class="card-header" style= "font-weight: bold;">
-                Predicted Fallout
+                Predicted UDO
             </div>
             <div class="card-body">
                 <p class="card-text"> In Development </p>
@@ -461,7 +462,7 @@
                 datasets: [
                 ...scatterDatasets,
                 {
-                    label: 'Average Liquidation Rate',
+                    label: 'Historical Average Drawdown',
                     data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x * 60 / 12 * 0.01, y: avgObligationSpent.ObligationSpent[i] })),
                     backgroundColor: 'rgba(0, 0, 255, 0.5)',
                     borderColor: 'rgba(0, 0, 255, 1)',
@@ -486,7 +487,7 @@
                     type: 'linear',
                     title: {
                     display: true,
-                    text: 'X Axis: Year',
+                    text: 'Liquidation Year',
                     font: { size: 20 }
                     },
                     ticks: {
@@ -569,16 +570,17 @@
         });
 
         
-        const initialTimeFrame = 'no_filter'
+        const initialTimeFrame = 'no_filter';
         const filteredScatterDatasets = filterScatterData(initialTimeFrame);
-        // Initial chart creation with global data
-        let currentChart = createChart(data_global, filteredScatterDatasets);
+        // Initial chart creation with filtered scatter datasets only
+        let currentChart = createChart({ GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
 
         calculatePointsAboveBelow_global(filteredScatterDatasets);
 
         // Event listener for data selector
         document.getElementById('dataSelector').addEventListener('change', function(event) {
-            const isGlobal = event.target.value === 'data_global';
+            const value = event.target.value;
+            const isGlobal = value === 'data_global';
             const selectedData = isGlobal ? data_global : data_country;
 
             updatePoints(isGlobal);
@@ -590,9 +592,13 @@
             if(currentChart){
                 currentChart.destroy();
             }
-            
-            // Create a new chart with the selected data
-            currentChart = createChart(selectedData, filteredScatterDatasets);
+
+            // Create a new chart with the selected data or only filtered scatter datasets if no option is selected
+            if (value === '') {
+                currentChart = createChart({ GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
+            } else {
+                currentChart = createChart(selectedData, filteredScatterDatasets);
+            }
 
             if(isGlobal) {
                 calculatePointsAboveBelow_global(filteredScatterDatasets);
@@ -609,16 +615,23 @@
 
         document.getElementById('timeSelector').addEventListener('change', function(event) {
             const timeFrame = event.target.value;
-            const isGlobal = document.getElementById('dataSelector').value === 'data_global';
+            const value = document.getElementById('dataSelector').value;
+            const isGlobal = value === 'data_global';
             const selectedData = isGlobal ? data_global : data_country;
 
             const filteredScatterDatasets = filterScatterData(timeFrame);
 
+            // Destroy the current chart instance
             if(currentChart){
                 currentChart.destroy();
             }
 
-            currentChart = createChart(selectedData, filteredScatterDatasets);
+            // Create a new chart with the selected data or only filtered scatter datasets if no option is selected
+            if (value === '') {
+                currentChart = createChart({ GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
+            } else {
+                currentChart = createChart(selectedData, filteredScatterDatasets);
+            }
 
             if(isGlobal) {
                 calculatePointsAboveBelow_global(filteredScatterDatasets);
