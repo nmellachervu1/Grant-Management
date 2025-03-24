@@ -573,7 +573,7 @@
         const initialTimeFrame = 'no_filter';
         const filteredScatterDatasets = filterScatterData(initialTimeFrame);
         // Initial chart creation with filtered scatter datasets only
-        let currentChart = createChart({ GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
+        let currentChart = createChart(country === "Global" ? data_global : { GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
 
         calculatePointsAboveBelow_global(filteredScatterDatasets);
 
@@ -627,7 +627,7 @@
             }
 
             // Create a new chart with the selected data or only filtered scatter datasets if no option is selected
-            if (value === '') {
+            if (value === '' && country !== "Global") {
                 currentChart = createChart({ GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
             } else {
                 currentChart = createChart(selectedData, filteredScatterDatasets);
