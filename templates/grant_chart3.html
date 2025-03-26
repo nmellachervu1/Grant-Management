@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="container-md mt-4">
-    <label for="dataSelector" style= "font-weight: bold;">Select Disbursement Pattern:</label>
+    <label for="dataSelector" style= "font-weight: bold;">Liquidation Pattern:</label>
     <select id="dataSelector">
         <option value="data_global">Portfolio Level</option>
         <option value="data_country">Country Level</option>
@@ -139,7 +139,7 @@
                     labels: data.GrantTimeElapsed,
                     datasets: [
                         {
-                            label: 'Actual Drawdown',
+                            label: 'Actual Liquidation',
                             data: overlayData.GrantTimeElapsed.map((x, i) => ({ x: x, y: overlayData.ObligationSpent[i] })),
                             backgroundColor: 'rgba(0, 0, 0, 0.5)',
                             borderColor: 'rgba(0, 0, 0, 1)',
@@ -150,7 +150,7 @@
                             order: 0 // Bring to front
                         },
                         {
-                            label: 'Forecasted Drawdown',
+                            label: 'Forecasted Liquidation',
                             data: obligationForecast.GrantTimeElapsed.map((x, i) => ({ x: x, y: obligationForecast.ObligationSpent[i] })),
                             backgroundColor: 'rgba(255, 255, 0, 0.5)',
                             borderColor: 'rgba(255, 255, 0, 1)',
@@ -161,7 +161,7 @@
 
                         },
                         {
-                            label: 'Historical Average Drawdown',
+                            label: 'Historical Average Liquidation Rate',
                             data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x, y: avgObligationSpent.ObligationSpent[i] })),
                             backgroundColor: 'rgba(0, 0, 255, 0.5)',
                             borderColor: 'rgba(0, 0, 255, 1)',
@@ -171,7 +171,7 @@
                             order: 0 // Ensure it appears above other lines
                         },
                         {
-                            label: 'Less Than 100% Liquidation Pattern',
+                            label: 'Below 100% Liquidation Pattern',
                             data: data.UDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i], y: y })),
                             backgroundColor: 'rgba(255, 153, 153, 0.5)',
                             borderColor: 'rgba(255, 153, 153, 1)',

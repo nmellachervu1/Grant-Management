@@ -107,7 +107,7 @@ BAC_SA_Grants = ['NU2GGH0021892020',
 
 BAC_US_Grants = ['NU14GH0012382020', 'NU2GGH0024062022', 'NU2HGH0000982021', 'NU51IP0009422022', 'NU2HGH0001002021', 'NU2HGH0000052021', 'NU2GGH0023212021', 'NU50CK0005472021', 'NU14GH0012382020', 'NU50CK0004942020', ]
 
-BAC_grant_tool = ['NU14GH0012382020', 
+BAC_grant_tool = ['NU14GH0012382020', 'U01GH0022482020',
     #     'NU2GGH0013532020', 'NU2GGH0014632019',
     #    'NU2GGH0019372020', 'NU2GGH0019372021', 'NU2GGH0019762020',
     #    'NU2GGH0019782020', 'NU2GGH0019792020', 'NU2GGH0019802020',
@@ -170,14 +170,18 @@ def grant():
     if request.method == "POST":
         grant_name = request.form.get("grant_name")
         #need to implement method to grab country via grant_name
-        #country = "SOUTH AFRICA"
         data, grant_data, grant_name2, grant_months_remaining, grantee, grant_obligation, grant_liquidated, grant_udo, udo_percentage, country = generate_graph_with_grant(grant_name)
         #print(country)
+        #country = "UGANDA"
+        #grantee = "Uganda Medical"
         country_area_data, avg_line = generate_country_graph_without_overlay(country)
+        #print("Country Area Data", country_area_data)
 
-        print(grant_data)
+        #print("Grant Data:", grant_data)
 
         forecast_data = run_regression_model(grant_name, grant_obligation, grant_months_remaining)
+
+        #print("Forecast Data", forecast_data)
 
         #print(avg_line)
         return render_template("grant_chart3.html", data=data, grant_data=grant_data, grant_name = grant_name2, months_remaining = grant_months_remaining, country_area_data = country_area_data, avg_line = avg_line, grantee = grantee, grant_obligation = grant_obligation, grant_liquidated = grant_liquidated, grant_udo = grant_udo, udo_percentage = udo_percentage, country = country, forecast_data = forecast_data)
@@ -231,11 +235,13 @@ def portfolio_SA():
 
     return render_template("SA_points6v2.html", data=area_data, latest_months_data=latest_months_data, total_obligations = total_obligations, total_liquidated = total_liquidated, remaining_obligations = remaining_obligations, total_current_UDO=total_current_UDO, UDO_percentage = UDO_percentage, country = "South Africa", country_area_data = country_area_data, avg_line = avg_line, num_grants = num_grants)
 
-BAC_UGANDA_Grants = ['NU2GGH0013532020',
- 'NU2GGH0020022022',
- 'NU2GGH0020222020',
- 'NU2GGH0020462020',
- 'NU2GGH0021402020',
+BAC_UGANDA_Grants = [
+# 'NU2GGH0013532020',
+# 'NU2GGH0020022022',
+# 'NU2GGH0020222020',
+# 'NU2GGH0020462020',
+# 'NU2GGH0021402020',
+ 'NU14GH0012382020',
  'NU2GGH0023092020',
  'NU2GGH0023562021',
  'NU2GGH0023582023',
@@ -571,7 +577,7 @@ def ai_summary_grant(docs):
 
         # Define prompt
         prompt = ChatPromptTemplate.from_messages(
-            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph with a trend line representing the latest Percent Obligation Spent against the Percent Elapsed Time for a specific grant (Both axis measured in percent). The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. Compare the latest point for the Grant Trend Data to a corresponding Red Shaded Area Data with the closest similar Percent Time Elapsed to identify whether the grant trend's latest point falls within the Red Shaded Area. Make sure to mention how the Red Shaded Areas are being calculated using either global or country specific data. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context}")]
+            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph with a trend line representing the latest Percent Obligation Spent against the Year Elapsed Time (Y1, Y2, Y3, Y4) for a specific grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. Simply compare the latest point for the Grant Trend Data to a corresponding Red Shaded Area Data with the closest similar Time Elapsed to identify whether the grant trend's latest point falls within the Red Shaded Area (Compare Percent Obligation Spent). Make sure to mention how the Red Shaded Areas are being calculated using either global or country specific data. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context} Make sure to accurately identify the x-axis value of the latest point and the corresponding y-axis value. ")]
         )
 
         # Instantiate chain
