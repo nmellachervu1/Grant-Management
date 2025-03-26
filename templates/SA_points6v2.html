@@ -44,7 +44,7 @@
 </style>
 
 <div class="container-md mt-4" id="dataSelectorDiv">
-    <label for="dataSelector" style= "font-weight: bold;">Disbursement Pattern:</label>
+    <label for="dataSelector" style= "font-weight: bold;">Liquidation Pattern:</label>
     <select id="dataSelector">
         <option value="">Select an option</option>
         <option value="data_global">Portfolio Level</option>
@@ -65,7 +65,8 @@
 </div>
 
 <div class="container-md mt-4">
-    <h5>{{ country }} Portfolio Liquidations Progress vs. Disbursement Patterns</h5>
+    <h5>{{ country }} Portfolio</h5>
+    <h5>Current Progress vs. Liquidation Patterns</h5>
         <div class="d-flex">
             <!-- Chart Section -->
                 <div class="flex-grow-1">
@@ -84,7 +85,7 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text", id="genai-summary">
-                        Please Select a Disbursement Pattern to Generate Summary
+                        Please select a Liquidation Pattern to generate summary
                     </p>
                 </div>
             </div>
@@ -99,7 +100,7 @@
         <!-- Canvas for Donut Chart -->
         <div class="card mt-4">
             <div class="card-header" style= "font-weight: bold;">
-                Total Obligations vs Total Liquidated
+                Remaining Obligations vs Total Liquidated
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-center">
@@ -466,7 +467,7 @@
                 datasets: [
                 ...scatterDatasets,
                 {
-                    label: 'Historical Average Drawdown',
+                    label: 'Historical Average Liquidation Rate',
                     data: avgObligationSpent.GrantTimeElapsed.map((x, i) => ({ x: x * 60 / 12 * 0.01, y: avgObligationSpent.ObligationSpent[i] })),
                     backgroundColor: 'rgba(0, 0, 255, 0.5)',
                     borderColor: 'rgba(0, 0, 255, 1)',
@@ -476,7 +477,7 @@
                     order: 0 // Ensure it appears above other lines
                 },
                 {
-                    label: 'Less Than 100% Liquidation Pattern',
+                    label: 'Below 100% Liquidation Pattern',
                     data: data.UDOPredictedLevel.map((y, i) => ({ x: data.GrantTimeElapsed[i] * 60 / 12 * 0.01, y: y })),
                     backgroundColor: 'rgba(255, 153, 153, 0.5)',
                     borderColor: 'rgba(255, 153, 153, 1)',
@@ -601,7 +602,7 @@
             if (value === '') {
                 currentChart = createChart({ GrantTimeElapsed: [], UDOPredictedLevel: [] }, filteredScatterDatasets);
                 if (country !== "Global") {
-                    document.getElementById('genai-summary').textContent = "Please Select a Disbursement Pattern to Generate Summary";
+                    document.getElementById('genai-summary').textContent = "Please select a Liquidation Pattern to generate summary";
                 }
                 resetPoints();
             } else {
