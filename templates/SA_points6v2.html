@@ -286,6 +286,11 @@
             const xValue = dataset.data[0].x;
             const yValue = dataset.data[0].y;
             // Find the two closest x-values in data_global.GrantTimeElapsed to perform interpolation
+
+            if(xValue >= 5 && yValue < 100) {
+                pointsBelow_global++;
+                return;
+            }
             
             let x1, y1, x2, y2;
              
@@ -345,6 +350,11 @@
                 const xValue = dataset.data[0].x;
                 const yValue = dataset.data[0].y;
                 // Find the two closest x-values in data_country.GrantTimeElapsed to perform interpolation
+
+                if(xValue >= 5 && yValue < 100) {
+                    pointsBelow_country++;
+                    return;
+                }
                 
                 let x1, y1, x2, y2;
                  
