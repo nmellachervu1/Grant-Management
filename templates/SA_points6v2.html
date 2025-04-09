@@ -567,7 +567,7 @@
         const donutChart = new Chart(donutCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Remaining Obligations', 'Total Liquidated'],
+                labels: ['Unliquidated Obligations', 'Liquidated Obligations'],
                 datasets: [{
                     data: [{{ remaining_obligations }}, {{ total_liquidated }}],
                     backgroundColor: ['#dc3545','#28a745'], // Green for obligations, Red for liquidated
