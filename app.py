@@ -241,14 +241,17 @@ BAC_UGANDA_Grants = [
 # 'NU2GGH0020222020',
 # 'NU2GGH0020462020',
 # 'NU2GGH0021402020',
- 'NU14GH0012382020',
  'NU2GGH0023092020',
  'NU2GGH0023562021',
- 'NU2GGH0023582023',
  'NU2HGH0000342020',
  'NU2HGH0000452020',
  'NU2HGH0000462020',
  'NU66GH0021722020',
+ 'NU2GGH0013532020',
+ 'NU2GGH0020222020',
+ 'NU2GGH0020462020',
+ 'NU2GGH0020022022',
+ 'NU2GGH0021402020',
  'U01GH0022482020']
 
 @app.route("/Uganda")
@@ -1005,13 +1008,19 @@ def generate_country_graph_without_overlay(Country_Name):
         udo_progression = obligation_progression[obligation_progression["UDO Status"] == "UDO"]
         non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non UDO"]
 
-        ### Calculate the mean Obligation for each Month Elapsed and then convert to percent
-        obligation_progression_avg = obligation_progression.groupby("Grant Months Elapsed")["Obligation Spent"].mean().reset_index()
+        # Filter out rows with UDO Status == "In-Progress"
+        obligation_progression_filtered = obligation_progression[obligation_progression["UDO Status"] != "In-Progress"]
 
-        #Convert Grant Months Elapsed to percent by dividing by 60 and multiplying by 100
+        # Calculate the mean Obligation for each Month Elapsed and then convert to percent
+        obligation_progression_avg = obligation_progression_filtered.groupby("Grant Months Elapsed")["Obligation Spent"].mean().reset_index()
+
+        # Ensure the average line includes all months up to 60
+        full_range = pd.DataFrame({'Grant Months Elapsed': range(61)})
+        obligation_progression_avg = pd.merge(full_range, obligation_progression_avg, on="Grant Months Elapsed", how="left")
+        obligation_progression_avg["Obligation Spent"] = obligation_progression_avg["Obligation Spent"].fillna(0)
+
+        # Convert Grant Months Elapsed to percent by dividing by 60 and multiplying by 100
         obligation_progression_avg["Grant Months Elapsed"] = obligation_progression_avg["Grant Months Elapsed"] / 60 * 100
-
-        obligation_progression_avg = obligation_progression_avg.fillna(0)
 
         avg_obligation_spent_list = {
             'GrantTimeElapsed': obligation_progression_avg['Grant Months Elapsed'].tolist(),
@@ -1022,11 +1031,11 @@ def generate_country_graph_without_overlay(Country_Name):
         if Country_Name == 'GLOBAL':
             window = 12
         else:
-            window = 10
-        
+            window = 12
+
         avg_obligation_spent_list['ObligationSpent'] = pd.Series(avg_obligation_spent_list['ObligationSpent']).rolling(window=window).mean().tolist()
 
-        #Replace missing ObligationSpent values with 0
+        # Replace missing ObligationSpent values with 0
         avg_obligation_spent_list['ObligationSpent'] = [0 if math.isnan(x) else x for x in avg_obligation_spent_list['ObligationSpent']]
 
         # Train model for UDO
