@@ -539,9 +539,19 @@ def run_regression_model(grant_to_forecast, grant_obligation, grant_months_remai
         'ObligationSpent': back_pred_samples.tolist(),
     }
 
-    #print(forecast_data)
+    # Remove keys and values where GrantTimeElapsed is higher than 100
+    filtered_data = {
+        'GrantTimeElapsed': [],
+        'ObligationSpent': []
+    }
+    for time, spent in zip(forecast_data['GrantTimeElapsed'], forecast_data['ObligationSpent']):
+        if time <= 100:
+            filtered_data['GrantTimeElapsed'].append(time)
+            filtered_data['ObligationSpent'].append(spent)
 
-    return forecast_data
+    #print("FORECAST:", filtered_data)
+
+    return filtered_data
 
 
 
@@ -580,7 +590,7 @@ def ai_summary_grant(docs):
 
         # Define prompt
         prompt = ChatPromptTemplate.from_messages(
-            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph with a trend line representing the latest Percent Obligation Spent against the Year Elapsed Time (Y1, Y2, Y3, Y4) for a specific grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. Simply compare the latest point for the Grant Trend Data to a corresponding Red Shaded Area Data with the closest similar Time Elapsed to identify whether the grant trend's latest point falls within the Red Shaded Area (Compare Percent Obligation Spent). Make sure to mention how the Red Shaded Areas are being calculated using either global or country specific data. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context} Make sure to accurately identify the x-axis value of the latest point and the corresponding y-axis value. Never say: 'x-axis value of _', instead say 'Year _'. Make sure to use all lower case expect for beginning of sentences and Year _. Replace Grant Trend Data with grant actual liquidation, Percent Obligation Spent with liquidated obligation percentage.")]
+            [("system", "Referencing the following: 'You are a graph analyzer assistant. You will be provided a graph with Grant Trend Data representing the historical percent ObligationSpent against the year GrantTimeElapsed (Y1, Y2, Y3, Y4) for a specific grant. The red line with a red shaded area below is the area trend of Grants with Less Than %100 Percent Liquidation Pattern, this pattern indicates that these grants are expected to leave behind obligation which requires intervention. Simply compare the Last Point in Grant Trend Data to the corresponding Red Shaded Area Data with the closest similar Time Elapsed to identify if the Grant Trend Data's latest point's Obligation Spent falls above or below the Red Shaded Area latest point's Obligation Spent. Make sure to mention how the Red Shaded Areas are being calculated using either global or country specific data. Use a single paragraph format.' Write a concise summary using this data:\\n\\n{context} Make sure to accurately identify the x-axis value of the latest point and the corresponding y-axis value. Never say: 'x-axis value of _', instead say 'Year _'. Make sure to use all lower case expect for beginning of sentences and Year _. Replace Grant Trend Data with grant actual liquidation, Percent Obligation Spent with liquidated obligation percentage. Round all percentages to whole numbers.")]
         )
 
         # Instantiate chain
