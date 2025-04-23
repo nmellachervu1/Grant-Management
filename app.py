@@ -93,7 +93,7 @@ Global_grants= [
     '20NU2HGH000077EBOLCV9390GUA2021', '23NU2GGH0024629390FKR2023', '20NU2HGH000051C69390JFD2022', '20NU2HGH000051C39390GBN2022', '21NU2GGH00237222C39390GAP2022', '21NU2GGH002372PEC69390J6U2022', '22NU2GGH0024019390FKR2023', '20NU2HGH0000519390K202022'
 ]
 
-BAC_grants = ['NU2GGH0024062022', 'NU2HGH0000982021', 'NU2HGH0000042021', 'U01GH0022482020','NU14GH0012382020', 'NU50CK0004942020', 'NU2GGH0024062022', 'NU2GGH0022152020', 'NU38OT0002822020', 'NU51IP0009422022', 'U01GH0023382021', 'NU2GGH0021942020', 'NU2GGH0021712021', 'NU2HGH0000742020', 'NU2GGH0024052023', 'NU2GGH0024272023', 'NU2GGH0023582023', 'NU2GGH0023782023', 'NU2GGH0022982023', 'NU2HGH0000812021']
+BAC_grants = ['NU2GGH0024062022', 'NU2HGH0000982021', 'NU2HGH0000042021', 'U01GH0022482020', 'NU2GGH0024062022', 'NU2GGH0022152020', 'NU51IP0009422022', 'U01GH0023382021', 'NU2GGH0021942020', 'NU2GGH0021712021', 'NU2HGH0000742020', 'NU2GGH0024052023', 'NU2GGH0024272023', 'NU2GGH0023582023', 'NU2GGH0023782023', 'NU2GGH0022982023', 'NU2HGH0000812021', 'NU2HGH0000382023', 'U01GH0022482019', 'NU2GGH0022212023']
 
 BAC_SA_Grants = ['NU2GGH0021892020',
  'NU2GGH0021952020',
@@ -248,17 +248,19 @@ BAC_UGANDA_Grants = [
  'NU2HGH0000462020',
  'NU66GH0021722020',
  'NU2GGH0013532020',
- 'NU2GGH0020222020',
- 'NU2GGH0020462020',
+# 'NU2GGH0020222020',
+# 'NU2GGH0020462020',
  'NU2GGH0020022022',
- 'NU2GGH0021402020',
+# 'NU2GGH0021402020',
  'U01GH0022482020']
+
+BAC_UGANDA_SELECTED_IN_PROGRESS = ['U01GH0022482020',  'NU2GGH0023582023',  'NU2HGH0000382023', 'U01GH0022482019', 'NU2GGH0022212023']
 
 @app.route("/Uganda")
 def portfolio_Uganda():
     #data = generate_graph_without_overlay()
     country = "UGANDA"
-    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(BAC_UGANDA_Grants)
+    area_data, latest_months_data, total_obligations, total_liquidated, total_current_UDO, UDO_percentage, num_grants = latest_months_in_grants(BAC_UGANDA_SELECTED_IN_PROGRESS)
     country_area_data, avg_line = generate_country_graph_without_overlay(country)
     #print(latest_months_data)
     if isinstance(area_data, tuple):
@@ -1019,10 +1021,10 @@ def generate_country_graph_without_overlay(Country_Name):
         non_udo_progression = obligation_progression[obligation_progression["UDO Status"] == "Non UDO"]
 
         # Filter out rows with UDO Status == "In-Progress"
-        obligation_progression_filtered = obligation_progression[obligation_progression["UDO Status"] != "In-Progress"]
+        # obligation_progression_filtered = obligation_progression[obligation_progression["UDO Status"] != "In-Progress"]
 
         # Calculate the mean Obligation for each Month Elapsed and then convert to percent
-        obligation_progression_avg = obligation_progression_filtered.groupby("Grant Months Elapsed")["Obligation Spent"].mean().reset_index()
+        obligation_progression_avg = obligation_progression.groupby("Grant Months Elapsed")["Obligation Spent"].mean().reset_index()
 
         # Ensure the average line includes all months up to 60
         full_range = pd.DataFrame({'Grant Months Elapsed': range(61)})
@@ -1039,7 +1041,7 @@ def generate_country_graph_without_overlay(Country_Name):
 
         # Apply rolling window to smooth the data
         if Country_Name == 'GLOBAL':
-            window = 12
+            window = 6
         else:
             window = 12
 
