@@ -1,0 +1,53 @@
+.card {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  }
+  
+  .title {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+  
+  .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #111827;
+    margin: 0;
+  }
+  
+  .delta {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .positive {
+    color: #16a34a;
+  }
+  
+  .negative {
+    color: #dc2626;
+  }
+  
+  .deltaSmall {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .valueWrap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+  
