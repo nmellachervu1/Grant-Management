@@ -24,7 +24,7 @@ import getpass
 
 load_dotenv()
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["OPENAI_API_KEY"] = ""
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 from langchain_openai import ChatOpenAI
 
@@ -272,7 +272,7 @@ def portfolio_Uganda():
     #total_obligations = "${:,.0f}".format(total_obligations)
     #total_liquidated = "${:,.0f}".format(total_liquidated)
 
-    total_grants = len(BAC_UGANDA_Grants)
+    total_grants = len(BAC_UGANDA_SELECTED_IN_PROGRESS)
 
 
     remaining_obligations = total_obligations - total_liquidated
