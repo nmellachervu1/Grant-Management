@@ -6,3 +6,6 @@ GHC Grant Data Test.xlsx
 .env
 ~$GHC Grant Data Test.xlsx
 darts_logs/
+venv/
+node_modules/
+BAC_Data.xlsx
