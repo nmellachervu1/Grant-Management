@@ -1,11 +1,11 @@
 __pycache__/
 grant_management_env/
 templates\old
-GHC FY21-23 Grant UDO Data.xlsx
-GHC Grant Data Test.xlsx
+BAC_Data.xlsx
 .env
-~$GHC Grant Data Test.xlsx
 darts_logs/
 venv/
 node_modules/
-BAC_Data.xlsx
+frontend\node_modules
+__pycache__/
+
